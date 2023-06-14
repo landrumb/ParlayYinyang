@@ -9,6 +9,8 @@
 #include "NSGDist.h"
 #include "parse_files.h"
 
+#include "implementations_ben.h"
+
 #include <iostream>
 #include <algorithm>
 #include <chrono>

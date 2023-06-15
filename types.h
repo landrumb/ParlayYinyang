@@ -22,17 +22,17 @@
 template <typename T>
 struct point {
     size_t id; // a unique (hopefully) identifier for the point
-    size_t dim; // the dimension of the point
+    // size_t dim; // the dimension of the point
     parlay::slice<T*, T*> coordinates; // the coordinates of the point
     double ub; // the upper bound of the point
     size_t best; // the index of the best center for the point
 
-    point(size_t id, size_t dim, T* vector) : id(id), dim(dim), coordinates(vector, vector + dim) {
-        this->ub = std::numeric_limits<double>::max();
-        this->best = -1;
-    }
+    // point(size_t id, size_t dim, T* vector) : id(id), dim(dim), coordinates(vector, vector + dim) {
+    //     this->ub = std::numeric_limits<double>::max();
+    //     this->best = -1;
+    // }
 
-    point() : id(-1), dim(-1), coordinates(nullptr, nullptr) {
+    point() : id(-1), coordinates(nullptr, nullptr) {
         this->ub = std::numeric_limits<double>::max();
         this->best = -1;
     }
@@ -42,7 +42,7 @@ template <typename T>
 struct center {
     size_t id; // a unique (hopefully) identifier for the center
     size_t dim; // the dimension of the center
-    parlay::sequence<T> coordinates; // the coordinates of the center
+    parlay::sequence<T> coordinates; // the pointer to coordinates of the center
     // parlay::slice<T*, T*> coordinates_slice; // a slice of the coordinates of the center
     double delta; // the delta of the center
     std::set<size_t> points; // the indices of the points in the center
@@ -77,7 +77,6 @@ struct center {
         this->points.clear();
         this->points_mutex.unlock();
     }
-
 };
 
 template <typename T>

@@ -18,40 +18,40 @@
 /* 
     A simple kmeans implementation that uses the naive algorithm
  */
-template <typename T>
-std::pair<parlay::sequence<center<T>>, double> naive_kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &centers, size_t k, size_t max_iterations, Distance D){
-    auto timer = parlay::internal::timer();
-    timer.start();
+// template <typename T>
+// std::pair<parlay::sequence<center<T>>, double> naive_kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &centers, size_t k, size_t max_iterations, Distance D){
+//     auto timer = parlay::internal::timer();
+//     timer.start();
 
-    size_t dim = v[0].dim;
+//     size_t dim = v[0].dim;
 
-    // initialize the centers by selecting k random points from v
-    auto center_indices = parlay::random_permutation(v.size()).cut(0, k);
-    // parlay::sequence<center<T>> centers(k);
-    for (size_t i = 0; i < k; i++) {
-        auto coordinates = parlay::tabulate(dim, [&](size_t j) {return v[center_indices[i]].coordinates[j];});
-        centers[i].coordinates = coordinates;
-        // centers[i].coordinates_slice = parlay::make_slice(coordinates);
-        centers[i].id = i;
-        centers[i].dim = dim;
-    }
-    // print progress update with elapsed time
-    std::cout << "Initialization: " << timer.next_time() << std::endl;
+//     // initialize the centers by selecting k random points from v
+//     auto center_indices = parlay::random_permutation(v.size()).cut(0, k);
+//     // parlay::sequence<center<T>> centers(k);
+//     for (size_t i = 0; i < k; i++) {
+//         auto coordinates = parlay::tabulate(dim, [&](size_t j) {return v[center_indices[i]].coordinates[j];});
+//         centers[i].coordinates = coordinates;
+//         // centers[i].coordinates_slice = parlay::make_slice(coordinates);
+//         centers[i].id = i;
+//         centers[i].dim = dim;
+//     }
+//     // print progress update with elapsed time
+//     std::cout << "Initialization: " << timer.next_time() << std::endl;
 
-    // do initial assignment of points to centers
-    parlay::parallel_for(0, v.size(), [&](size_t i) {
-        v[i].best = 0;
-        v[i].ub = D(v[i].coordinates, parlay::make_slice(centers[0].coordinates), dim);
-        for (size_t j = 1; j < k; j++) {
-            double dist = D(v[i].coordinates, parlay::make_slice(centers[j].coordinates), dim);
-            if (dist < v[i].ub) {
-                v[i].best = j;
-                v[i].ub = dist;
-            }
-        }
-        // parallel insertion with mutex
-        centers[v[i].best].add_point(v[i].id);
-    });
+//     // do initial assignment of points to centers
+//     parlay::parallel_for(0, v.size(), [&](size_t i) {
+//         v[i].best = 0;
+//         v[i].ub = D(v[i].coordinates, parlay::make_slice(centers[0].coordinates), dim);
+//         for (size_t j = 1; j < k; j++) {
+//             double dist = D(v[i].coordinates, parlay::make_slice(centers[j].coordinates), dim);
+//             if (dist < v[i].ub) {
+//                 v[i].best = j;
+//                 v[i].ub = dist;
+//             }
+//         }
+//         // parallel insertion with mutex
+//         centers[v[i].best].add_point(v[i].id);
+//     });
 
     // std::cout << "Initial assignment: " << timer.next_time() << std::endl;
 
@@ -120,22 +120,25 @@ std::pair<parlay::sequence<center<T>>, double> naive_kmeans(parlay::sequence<poi
     //     std::cout << "Iteration " << i << ": " << timer.next_time() << std::endl;
     // }
 
-    return std::make_pair(centers, timer.total_time());
-};
+//     return std::make_pair(centers, timer.total_time());
+// };
 
 template <typename T>
 double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &centers, size_t k, size_t max_iterations, Distance D){
     auto timer = parlay::internal::timer();
     timer.start();
 
-    size_t dim = v[0].dim;
+    size_t dim = v[0].coordinates.size();
     size_t n = v.size();
 
+    
     // initialize the centers by selecting k random points from v
     auto center_indices = parlay::random_permutation(n).cut(0, k);
     for (size_t i = 0; i < k; i++) {
-        auto coordinates = parlay::tabulate(dim, [&](size_t j) {return v[center_indices[i]].coordinates[j];});
-        centers[i].coordinates = coordinates;
+        for (size_t j = 0; j < dim; j++) {
+            // std::cout << j << std::endl;
+            centers[i].coordinates[j] = v[center_indices[i]].coordinates[j];
+        }
         centers[i].id = i;
         centers[i].dim = dim;
     }
@@ -154,6 +157,8 @@ double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &center
         centers[v[i].best].add_point(i);
     });
 
+    std::cout << "Initial assignment: " << timer.next_time() << std::endl;
+
     // initial center update
     parlay::parallel_for(0, k, [&](size_t i) {
         parlay::sequence<double> new_center(dim);
@@ -168,16 +173,17 @@ double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &center
         }
     });
 
+    std::cout << "Initial center update: " << timer.next_time() << std::endl;
+
     for (size_t iteration=1; iteration <= max_iterations; iteration++){
         // update assignments
         std::atomic<size_t> num_changed(0);
         parlay::parallel_for(0, n, [&](size_t i) {
             size_t old_best = v[i].best;
-            v[i].best = 0;
-            v[i].ub = D.distance(v[i].coordinates.begin(), centers[0].coordinates.begin(), dim);
             for (size_t j = 1; j < k; j++) {
                 double dist = D.distance(v[i].coordinates.begin(), centers[j].coordinates.begin(), dim);
                 if (dist < v[i].ub) {
+                    num_changed++;
                     v[i].best = j;
                     v[i].ub = dist;
                 }
@@ -190,6 +196,7 @@ double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &center
         });
 
         if (num_changed == 0) {
+            std::cout << "converged!" << std::endl;
             break;
         }
 
@@ -210,7 +217,7 @@ double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &center
         std::cout << "Iteration " << iteration << ": " << timer.next_time() << std::endl;
     }
 
-    std::cout << "Total time: " << timer.total_time() << std::endl;
+    // std::cout << "Total time: " << timer.total_time() << std::endl;
 
     return timer.total_time();
 }

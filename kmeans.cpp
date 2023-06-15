@@ -80,11 +80,17 @@ int main(int argc, char* argv[]){
         if (tp == "float") {
             parlay::sequence<point<float>> v = parse_fvecs(input.c_str());
             parlay::sequence<center<float>> centers(k);
+            for (size_t i = 0; i < k; i++) {
+                centers[i].coordinates = parlay::sequence<float>(v[0].coordinates.size());
+            }
             runtime = kmeans<float>(v, centers, k, max_iterations, *D);
         } 
         else if (tp == "uint8") {
             auto v = parse_bvecs(input.c_str());
             parlay::sequence<center<uint8_t>> centers(k);
+            for (size_t i = 0; i < k; i++) {
+                centers[i].coordinates = parlay::sequence<uint8_t>(v[0].coordinates.size());
+            }
             runtime = kmeans<uint8_t>(v, centers, k, max_iterations, *D);
         } else {
             std::cout << "Error: vector type can only be float or uint8. Supplied type is " << tp << "." << std::endl;
@@ -94,15 +100,24 @@ int main(int argc, char* argv[]){
     else if (ft == "bin"){
         if (tp == "float") {
             auto v = parse_fbin(input.c_str());
-            parlay::sequence<center<float>> centers(k);
+            parlay::sequence<center<float>> centers(k); // preallocate center coordinates, need to free later
+            for (size_t i = 0; i < k; i++) {
+                centers[i].coordinates = parlay::sequence<float>(v[0].coordinates.size());
+            }
             runtime = kmeans<float>(v, centers, k, max_iterations, *D);
         } else if (tp == "uint8") {
             auto v = parse_uint8bin(input.c_str());
             parlay::sequence<center<uint8_t>> centers(k);
+            for (size_t i = 0; i < k; i++) {
+                centers[i].coordinates = parlay::sequence<uint8_t>(v[0].coordinates.size());
+            }
             runtime = kmeans<uint8_t>(v, centers, k, max_iterations, *D);
         } else if (tp == "int8") {
             auto v = parse_int8bin(input.c_str());
             parlay::sequence<center<int8_t>> centers(k);
+            for (size_t i = 0; i < k; i++) {
+                centers[i].coordinates = parlay::sequence<int8_t>(v[0].coordinates.size());
+            }
             runtime = kmeans<int8_t>(v, centers, k, max_iterations, *D);
         } else {
             // this should actually be unreachable

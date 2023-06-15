@@ -18,6 +18,51 @@
 #include <set>
 #include <atomic>
 #include <utility>
+#include <type_traits>
+
+template <typename T>
+int empty_centers(parlay::sequence<center<T>> &centers){
+    int empty = 0;
+    for (size_t i = 0; i < centers.size(); i++) {
+        if (centers[i].points.size() == 0) {
+            empty++;
+        }
+    }
+    return empty;
+}
+
+template<typename T>
+double avg_center_size(parlay::sequence<center<T>> &centers){
+    double avg = 0;
+    for (size_t i = 0; i < centers.size(); i++) {
+        avg += centers[i].points.size();
+    }
+    return avg / centers.size();
+}
+
+// the world's most heinous function name
+template <typename T>
+double dist_between_first_center_and_centroid(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &centers, Distance D){
+    size_t dim = centers[0].coordinates.size();
+    parlay::sequence<double> centroid(dim);
+    for (size_t i = 0; i < dim; i++) {
+        centroid[i] = 0;
+    }
+
+    for (auto it = centers[0].points.begin(); it != centers[0].points.end(); it++) {
+        for (size_t i = 0; i < dim; i++) {
+            centroid[i] += v[*it].coordinates[i];
+        }
+    }
+    
+    for (size_t i = 0; i < dim; i++) {
+        centroid[i] /= (double) centers[0].points.size();
+    }
+
+    parlay::sequence<T> centroid_seq(centroid.begin(), centroid.end());
+
+    return D.distance(centers[0].coordinates.begin(), centroid_seq.begin(), dim);
+}
 
 template <typename T>
 inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, Distance *D, double &runtime){
@@ -26,6 +71,10 @@ inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, Distance *D
         centers[i].coordinates = parlay::sequence<T>(v[0].coordinates.size());
     }
     runtime = kmeans<T>(v, centers, k, m, *D);
+
+    std::cout << empty_centers(centers) << " empty centers" << std::endl;
+    std::cout << avg_center_size(centers) << " average center size" << std::endl;
+    std::cout << dist_between_first_center_and_centroid(v, centers, *D) << " distance between first center and centroid" << std::endl;
     return;
 }
 
@@ -41,18 +90,7 @@ int main(int argc, char* argv[]){
     std::string tp = std::string(P.getOptionValue("-t", "uint8"));
     std::string dist = std::string(P.getOptionValue("-D", "Euclidian"));
 
-    // size_t k = 10;
-    // size_t max_iterations = 1000;
-    // size_t dim = 2;
-    // std::string output = "kmeans_results.csv";
-    // std::string input = "";
-    // std::string ft = "bin";
-    // std::string tp = "uint8";
-    // std::string dist = "Euclidian";
-
-
     double runtime;
-    // size_t dim;
     
     if(input == ""){
         std::cout << "Error: input file not specified" << std::endl;

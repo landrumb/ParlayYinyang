@@ -19,12 +19,12 @@
     A simple kmeans implementation that uses the naive algorithm
  */
 template <typename T>
-std::pair<parlay::sequence<center<T>>, double> naive_kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &centers, size_t k, size_t max_iterations, Distance& D){
+std::pair<parlay::sequence<center<T>>, double> naive_kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &centers, size_t k, size_t max_iterations, Distance D){
     auto timer = parlay::internal::timer();
     timer.start();
 
     // initialize the centers by selecting k random points from v
-    auto center_indices = parlay::random_permutation(v.size()).slice(0, k);
+    auto center_indices = parlay::random_permutation(v.size()).cut(0, k);
     // parlay::sequence<center<T>> centers(k);
     for (size_t i = 0; i < k; i++) {
         centers[i] = center<T>(i, parlay::sequence(v[center_indices[i]].coordinates));

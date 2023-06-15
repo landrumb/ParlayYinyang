@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
         if (tp == "float") {
             parlay::sequence<point<float>> v = parse_fvecs(input.c_str());
             parlay::sequence<center<float>> centers(k);
-            auto output_pair = naive_kmeans<float>(v, centers, k, max_iterations, D);
+            auto output_pair = naive_kmeans<float>(v, centers, k, max_iterations, *D);
         } 
         // else if (tp == "uint8") {
         //     auto v = parse_bvecs(input.c_str());

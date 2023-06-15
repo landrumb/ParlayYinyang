@@ -210,5 +210,7 @@ double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &center
         std::cout << "Iteration " << iteration << ": " << timer.next_time() << std::endl;
     }
 
+    std::cout << "Total time: " << timer.total_time() << std::endl;
+
     return timer.total_time();
 }

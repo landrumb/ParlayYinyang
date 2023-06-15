@@ -21,11 +21,10 @@
 
 
 int main(int argc, char* argv[]){
-    commandLine P(argc, argv, "[-k <n_clusters>] [-m <iterations>] [-d <dimension>] [-o <output>] [-i <input>] [-f <ft>] [-t <tp>] [-D <dist>]");
+    commandLine P(argc, argv, "[-k <n_clusters>] [-m <iterations>] [-o <output>] [-i <input>] [-f <ft>] [-t <tp>] [-D <dist>]");
 
     size_t k = P.getOptionLongValue("-k", 10);
     size_t max_iterations = P.getOptionLongValue("-m", 1000);
-    size_t dim = P.getOptionLongValue("-d", 2);
     std::string output = std::string(P.getOptionValue("-o", "kmeans_results.csv"));
     std::string input = std::string(P.getOptionValue("-i", ""));
     std::string ft = std::string(P.getOptionValue("-f", "bin"));
@@ -43,6 +42,7 @@ int main(int argc, char* argv[]){
 
 
     double runtime;
+    // size_t dim;
     
     if(input == ""){
         std::cout << "Error: input file not specified" << std::endl;

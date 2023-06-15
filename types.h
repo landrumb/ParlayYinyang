@@ -43,14 +43,16 @@ struct center {
     size_t id; // a unique (hopefully) identifier for the center
     size_t dim; // the dimension of the center
     parlay::sequence<T> coordinates; // the coordinates of the center
+    // parlay::slice<T*, T*> coordinates_slice; // a slice of the coordinates of the center
     double delta; // the delta of the center
     std::set<size_t> points; // the indices of the points in the center
     std::mutex points_mutex; // a mutex to lock the points set
     
-    center(size_t id, parlay::sequence<T> coordinates) : id(id), dim(dim){
+    center(size_t id, size_t dim, parlay::sequence<T> coordinates) : id(id), dim(dim){
         this->delta = 0;
-        // this->points = std::set<size_t>();
+        this->points = std::set<size_t>();
         this->coordinates = coordinates;
+        // this->coordinates_slice = parlay::make_slice(coordinates);
     }
 
     center() : id(-1), dim(-1) {

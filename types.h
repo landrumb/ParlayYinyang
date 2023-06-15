@@ -1,3 +1,5 @@
+#ifndef KMEANS_TYPES
+
 #include "parlay/parallel.h"
 #include "parlay/primitives.h"
 #include "parlay/sequence.h"
@@ -10,6 +12,9 @@
 #include <limits>
 #include <set>
 #include <atomic>
+#include <mutex>
+
+#define KMEANS_TYPES
 
 /* 
     It's desirable that the point struct not handle much clustering-implementation-specific logic so parsing code can be easily reused
@@ -39,7 +44,8 @@ struct center {
     size_t dim; // the dimension of the center
     parlay::sequence<T> coordinates; // the coordinates of the center
     double delta; // the delta of the center
-    std::atomic<std::set<size_t>> points; // the indices of the points in the center
+    std::set<size_t> points; // the indices of the points in the center
+    std::mutex points_mutex; // a mutex to lock the points set
     
     center(size_t id, parlay::sequence<T> coordinates) : id(id), dim(dim){
         this->delta = 0;
@@ -53,15 +59,21 @@ struct center {
     }
 
     void add_point(size_t point_id) {
+        this->points_mutex.lock();
         this->points.insert(point_id);
+        this->points_mutex.unlock();
     }
 
     void remove_point(size_t point_id) {
+        this->points_mutex.lock();
         this->points.erase(point_id);
+        this->points_mutex.unlock();
     }
 
     void clear_points() {
+        this->points_mutex.lock();
         this->points.clear();
+        this->points_mutex.unlock();
     }
 
 };
@@ -72,3 +84,5 @@ struct group {
     parlay::sequence<center<T>*> centers; // pointers to the centers in the group
 
 };
+
+#endif

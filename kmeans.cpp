@@ -19,6 +19,16 @@
 #include <atomic>
 #include <utility>
 
+template <typename T>
+inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, Distance *D, double &runtime){
+    parlay::sequence<center<T>> centers(k);
+    for (size_t i = 0; i < k; i++) {
+        centers[i].coordinates = parlay::sequence<T>(v[0].coordinates.size());
+    }
+    runtime = kmeans<T>(v, centers, k, m, *D);
+    return;
+}
+
 
 int main(int argc, char* argv[]){
     commandLine P(argc, argv, "[-k <n_clusters>] [-m <iterations>] [-o <output>] [-i <input>] [-f <ft>] [-t <tp>] [-D <dist>]");
@@ -79,19 +89,11 @@ int main(int argc, char* argv[]){
     if (ft == "vec") {
         if (tp == "float") {
             parlay::sequence<point<float>> v = parse_fvecs(input.c_str());
-            parlay::sequence<center<float>> centers(k);
-            for (size_t i = 0; i < k; i++) {
-                centers[i].coordinates = parlay::sequence<float>(v[0].coordinates.size());
-            }
-            runtime = kmeans<float>(v, centers, k, max_iterations, *D);
+            bench<float>(v, k, max_iterations, D, runtime);
         } 
         else if (tp == "uint8") {
             auto v = parse_bvecs(input.c_str());
-            parlay::sequence<center<uint8_t>> centers(k);
-            for (size_t i = 0; i < k; i++) {
-                centers[i].coordinates = parlay::sequence<uint8_t>(v[0].coordinates.size());
-            }
-            runtime = kmeans<uint8_t>(v, centers, k, max_iterations, *D);
+            bench<uint8_t>(v, k, max_iterations, D, runtime);
         } else {
             std::cout << "Error: vector type can only be float or uint8. Supplied type is " << tp << "." << std::endl;
             abort();
@@ -100,25 +102,14 @@ int main(int argc, char* argv[]){
     else if (ft == "bin"){
         if (tp == "float") {
             auto v = parse_fbin(input.c_str());
-            parlay::sequence<center<float>> centers(k); // preallocate center coordinates, need to free later
-            for (size_t i = 0; i < k; i++) {
-                centers[i].coordinates = parlay::sequence<float>(v[0].coordinates.size());
-            }
-            runtime = kmeans<float>(v, centers, k, max_iterations, *D);
+            bench<float>(v, k, max_iterations, D, runtime);
         } else if (tp == "uint8") {
             auto v = parse_uint8bin(input.c_str());
-            parlay::sequence<center<uint8_t>> centers(k);
-            for (size_t i = 0; i < k; i++) {
-                centers[i].coordinates = parlay::sequence<uint8_t>(v[0].coordinates.size());
-            }
-            runtime = kmeans<uint8_t>(v, centers, k, max_iterations, *D);
+            bench<uint8_t>(v, k, max_iterations, D, runtime);
         } else if (tp == "int8") {
             auto v = parse_int8bin(input.c_str());
             parlay::sequence<center<int8_t>> centers(k);
-            for (size_t i = 0; i < k; i++) {
-                centers[i].coordinates = parlay::sequence<int8_t>(v[0].coordinates.size());
-            }
-            runtime = kmeans<int8_t>(v, centers, k, max_iterations, *D);
+            bench<int8_t>(v, k, max_iterations, D, runtime);
         } else {
             // this should actually be unreachable
             std::cout << "Error: bin type can only be float, uint8, or int8. Supplied type is " << tp << "." << std::endl;

@@ -19,7 +19,7 @@
 struct Distance {
     int a;
 
-};
+}; 
 
 //std::pair<parlay::sequence<center<T>>,double>
 template <typename T> auto naive_kmeans(parlay::sequence<point<T>>& v, size_t k, size_t max_iterations, Distance& D){

@@ -2,8 +2,11 @@
 
 #include "implementations_shared.h"
 
+//g++ naivetestkmeans.cc -o naivetestkmeans.out -std=c++17
+
+
 int main() {
-    std::cout << "hi";
+    std::cout << "hi" << std::endl;
 
     size_t n=50; //number of points
     size_t d=1; //number of dimensions

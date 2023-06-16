@@ -29,15 +29,16 @@ struct PPoint {
     size_t id;
     bool change_flag = false; //store if a point changed its center in this iteration
 
+    PPoint() {
+        
+    }
+
     PPoint(size_t d, size_t id) {
         coordinates = sequence<T>(d);
         this->id=id;
 
     } 
 
-    PPoint() {
-        
-    }
 };
 template <typename T>
 struct PCenter {
@@ -90,6 +91,7 @@ template <typename T> double distanceA_help(const sequence<T>& p1, const sequenc
         [&]() {right_sum = distanceA_help(p1,p2,len,mid,dend);}
         );
 
+
         return left_sum+right_sum;
     }
    
@@ -125,6 +127,7 @@ template<typename T> size_t closest_point(const PPoint<T>& p, const sequence<PCe
     return distanceA(p,centerpoint);
   });
 
+
   return std::min_element(distances.begin(),distances.end()) - distances.begin();  
 
 }
@@ -142,8 +145,12 @@ template<typename T> std::pair<T,size_t> anti_overflow_avg_help(const sequence<T
 
     size_t mid = (start + end) / 2;
     std::pair<T,size_t> l,r;
-    par_do([&](){l = anti_overflow_avg_help(seq,start,mid);}, 
-    [&](){r = anti_overflow_avg_help(seq,mid,end);});
+    parlay::par_do(
+    [&](){l = anti_overflow_avg_help(seq,start,mid);}, 
+    [&](){r = anti_overflow_avg_help(seq,mid,end);}
+    );
+
+
     return std::make_pair((l.first*l.second +r.first * r.second)/(l.second + r.second),l.second + r.second);
 
 }
@@ -178,12 +185,13 @@ template<typename T> sequence<PCenter<T>> compute_centers(const sequence<PPoint<
     }
 
     
-    parallel_for (0, k*d, [&] (size_t icoord){
+    parlay::parallel_for (0, k*d, [&] (size_t icoord){
         size_t i = icoord / d;
         size_t coord = icoord % d;
-        new_centers[i].coordinates[coord] = anti_overflow_avg(map(indices[i],[&] (size_t ind) {return pts[ind].coordinates[coord];}  ));
+        new_centers[i].coordinates[coord] = anti_overflow_avg(map(indices[pts[i].id],[&] (size_t ind) {return pts[ind].coordinates[coord];}  ));
 
     });
+
 
     return new_centers;
 
@@ -242,7 +250,6 @@ template <typename T> std::pair<sequence<PCenter<T>>,double> naive_kmeans(parlay
 
     centers = std::move(new_centers);
   }
-
 
     return std::make_pair(centers,timer.total_time());
 

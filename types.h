@@ -36,6 +36,8 @@ struct point {
         this->ub = std::numeric_limits<double>::max();
         this->best = -1;
     }
+
+
 };
 
 template <typename T>

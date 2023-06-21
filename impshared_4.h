@@ -28,6 +28,25 @@ using namespace parlay;
 template<typename T> std::pair<T,size_t> anti_overflow_avg_help(const sequence<T> &seq, size_t start, size_t end);
 template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay::sequence<point<T>>& pts, size_t k, size_t max_iterations, double epsilon);
 
+
+sequence<size_t> randseq(size_t n, size_t k){
+    assert(n > k);
+    std::random_device randomizer;
+    std::mt19937 generate(randomizer());
+   // std::uniform_int_distribution<size_t> dis(1, n);
+
+    sequence<size_t> random_numbers(k);
+    size_t bucket = n / k;
+
+    parallel_for(0, k, [&](size_t i){
+         std::uniform_int_distribution<size_t> dis(bucket * i, bucket * (i+1) - 1);
+        random_numbers[i] = dis(generate);
+    });
+  
+
+  return random_numbers;
+}
+
 template <typename T> void print_point(const point<T>& p) {
   std::cout << "Po: " << p.id << " " << p.best << std::endl;
   for (T* i = p.coordinates.begin(); i != p.coordinates.end(); i = std::next(i) ) {
@@ -212,10 +231,11 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
 template <typename T> sequence<center<T>> create_centers(const parlay::sequence<point<T>>& pts,size_t n, size_t k, size_t d) {
     parlay::random_generator gen;
     //std::uniform_int_distribution<> dis(0, n/k);
-    sequence<size_t> starting_coords = tabulate(k,[&] (size_t i) {
-        size_t r = 1;
-        return (n/k)*i+r;
-    });
+    // sequence<size_t> starting_coords = tabulate(k,[&] (size_t i) {
+    //     size_t r = 1;
+    //     return (n/k)*i+r;
+    // });
+    sequence<size_t> starting_coords = randseq(n,k);
 
     std::cout << "starting coords" << std::endl;
     for (int i = 0; i < k; i++) {

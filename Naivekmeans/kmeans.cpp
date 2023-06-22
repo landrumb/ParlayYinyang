@@ -1,4 +1,5 @@
 
+
 #include "types.h"
 #include "parse_files.h"
 #include "parse_command_line.h"
@@ -31,6 +32,8 @@ inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, double &run
 }
 
 
+//./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10
+//run with this 
 int main(int argc, char* argv[]){
     //P is the prompt
     commandLine P(argc, argv, "[-k <n_clusters>] [-m <iterations>] [-o <output>] [-i <input>] [-f <ft>] [-t <tp>]");

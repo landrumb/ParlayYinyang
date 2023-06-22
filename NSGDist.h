@@ -1,9 +1,9 @@
 // taken from ParlayANN 6/13/2023
-
+//comment-papa
 //
 // Created by 付聪 on 2017/6/21.
 //
-
+//comment-Mo
 #ifndef EFANNA2E_DISTANCE_H
 #define EFANNA2E_DISTANCE_H
 

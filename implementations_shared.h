@@ -201,7 +201,7 @@ template <typename T> std::pair<sequence<PCenter<T>>,double> naive_kmeans(parlay
 
     parlay::internal::timer timer = parlay::internal::timer();
     timer.start();
-    std::cout << "running" << std::endl;
+    std::cout << "running222" << std::endl;
 
     std::random_device randomize;
     std::mt19937 generate(randomize());

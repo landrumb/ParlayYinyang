@@ -5,13 +5,7 @@
 //Andrew, Mohammed, Papa
 
 #include "types.h"
-#include "parlay/primitives.h"
-#include "parlay/parallel.h"
-#include "parlay/sequence.h"
-#include "parlay/slice.h"
-#include "parlay/random.h"
-#include "parlay/delayed.h"
-#include "parlay/io.h"
+
 
 #include <algorithm>
 #include <cmath>
@@ -160,7 +154,7 @@ template<typename T> T anti_overflow_avg(const sequence<T>& seq) {
 
 //take the avg of seq in a way that doesn't cause overflow
 template<typename T> std::pair<T,size_t> anti_overflow_avg_help(const sequence<T> &seq, size_t start, size_t end) {
-    if(start == end - 1){
+    if(start == end - 1){ // if end-start < Bound do sequentially
         return std::make_pair(seq[start],1);
     }   
 
@@ -246,7 +240,7 @@ template <typename T> sequence<center<T>> create_centers(const parlay::sequence<
     // Initialize centers randomly
     sequence<center<T>> centers(k);
     for (int i = 0; i < k; i++) {
-        centers[i].coordinates = parlay::sequence<double>(d, 0.0);
+        centers[i].coordinates = parlay::sequence<T>(d, 0);
         for (size_t j = 0; j < d; j++) {
             centers[i].coordinates[j] = pts[starting_coords[i]].coordinates[j];
         }
@@ -286,17 +280,19 @@ template <typename T> double naive_kmeans(parlay::sequence<point<T>>& pts, size_
 
   int iterations = 0;
 
+  double total_diff = 0;
+
   while (iterations < max_iterations) {
 
    
     std::cout << "iter" << iterations << std::endl;
     iterations++;
 
-     std::cout << "center printing" << std::endl;
-  for (int i = 0; i < k; i++) {
-    print_center(centers[i]);
-  }
-  std::cout << std::endl << std::endl;
+  //    std::cout << "center printing" << std::endl;
+  // for (int i = 0; i < k; i++) {
+  //   print_center(centers[i]);
+  // }
+  // std::cout << std::endl << std::endl;
 
     // Assign each point to the closest center
     parlay::parallel_for(0, pts.size(), [&](size_t i) {
@@ -309,7 +305,7 @@ template <typename T> double naive_kmeans(parlay::sequence<point<T>>& pts, size_
     sequence<center<T>> new_centers = compute_centers(pts, centers, k, d, n);
 
     // Check convergence
-    double total_diff = 0.0;
+    total_diff = 0.0;
     for (int i = 0; i < k; i++) {
       double diff = distanceA(centers[i].coordinates, new_centers[i].coordinates,0,d);
       total_diff += diff;
@@ -326,9 +322,10 @@ template <typename T> double naive_kmeans(parlay::sequence<point<T>>& pts, size_
   }
 
    std::cout << "center printing" << std::endl;
-  for (int i = 0; i < k; i++) {
-    print_center(centers[i]);
-  }
+  // for (int i = 0; i < k; i++) {
+  //   print_center(centers[i]);
+  // }
+  std::cout << "Error" << total_diff << std::endl;
   std::cout << std::endl << std::endl;
     
 

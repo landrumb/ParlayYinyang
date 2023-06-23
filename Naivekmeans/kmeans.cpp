@@ -3,7 +3,8 @@
 #include "parse_command_line.h"
 
 #include "impshared_4.h"
-//#include "kmeans_guy.h"
+
+#include "kmeans_guy.h"
 
 #include <iostream>
 #include <algorithm>

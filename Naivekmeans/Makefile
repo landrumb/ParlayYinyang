@@ -33,6 +33,5 @@ kmeans: kmeans.cpp impshared_4.h
 andrew_kmeans: kmeans.cpp impshared_4.h
 	$(ANDREW_FLAGS)  -o kmeans kmeans.cpp  
 
-
 clean:
 	rm -f kmeans

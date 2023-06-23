@@ -1,6 +1,5 @@
 #ifndef KMEANS_TYPES
 
-
 #include "../parlay/random.h"
 #include "../parlay/parallel.h"
 #include "../parlay/primitives.h"
@@ -50,13 +49,6 @@ struct center {
     center() : id(-1) {
        
     }
-
-};
-
-template <typename T>
-struct group {
-    size_t id; // a unique (hopefully) identifier for the group
-    parlay::sequence<center<T>*> centers; // pointers to the centers in the group
 
 };
 

@@ -45,7 +45,7 @@ void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double
     return;
 }
 //./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10
-//./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000 -f bin -t uint8 -m 10
+//./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000 -f bin -t uint8 -m 10 
 
 //run with this 
 int main(int argc, char* argv[]){

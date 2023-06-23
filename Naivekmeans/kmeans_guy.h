@@ -47,7 +47,6 @@ template <typename T> double euclidean_squared(const slice<T*,T*>& a, const sequ
 // the 100 in the following two is for granularity control
 // i.e. if the number of dimensions is less than 100, run sequentially
 template <typename T> sequence<T> operator/(const sequence<T>& a, const double b) {
-
   return parlay::map(a, [=] (T v) {return (T) (v/b);}, 100);}
 
 template <typename T> sequence<T> operator/(const point<T>&a, const double b) {
@@ -58,7 +57,6 @@ template <typename T> sequence<T> operator/(const slice<T*,T*>& a, const double 
 
 template <typename T> sequence<T> operator+(const sequence<T>& a, const sequence<T>& b) {
   if (a.size() == 0) return b;
-
   return parlay::tabulate(a.size(), [&] (size_t i) {return (T) (a[i] + b[i]);}, 100);}
 
 template <typename T> sequence<T> operator+(const sequence<T>& a, const slice<T*,T*>& b) {
@@ -116,6 +114,7 @@ template <typename T> std::pair<sequence<center<T>>,double> guy_kmeans(sequence<
   assert(n > 0); // need nonempty point size 
   size_t d = pts[0].coordinates.size();
 
+
   long round = 0;
   while (round < max_iterations) {
     // for each point find closest among the k centers (kpts)
@@ -126,6 +125,10 @@ template <typename T> std::pair<sequence<center<T>>,double> guy_kmeans(sequence<
 //     sequence<std::pair<size_t, point<T>>> closest = parlay::map(pts, [&] (const point<T>& p) {
 //       return std::pair{guy_closest_point(p, centers),p};}); //p note p instead of a (p,1) pair
 // >>>>>>> 791a831 (forgot to commit, note Guy's code not ready yet)
+// =======
+//     sequence<std::pair<point<T>,size_t>> closest = parlay::map(pts, [&] (const point<T>& p) {
+//       return std::pair{p,guy_closest_point(p, centers)};}); //p note p instead of a (p,1) pair
+// >>>>>>> f203cdd (trying to push)
 
     // Sum the points that map to each of the k centers
     //using a homemade reduce_by_index because

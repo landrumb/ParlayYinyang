@@ -19,18 +19,27 @@
 //why is this inline? Q*
 template <typename T>
 inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
-    parlay::sequence<center<T>> centers(k);
-    for (size_t i = 0; i < k; i++) {
-        centers[i].coordinates = parlay::sequence<T>(v[0].coordinates.size());
-    }
-    runtime = naive_kmeans<T>(v, k, m);
+   
+    runtime = kmeans_justtime<T>(v, k, m);
 
    
     return;
 }
 
+void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
+    assert(v.size() > 0) //want a nonempty point set
+    parlay::sequence<center<T>> centers(k) = create_centers(v,v.size(),k,v[0].coordinates.size());
 
+    double runtime1 = naive_kmeans<T>(v, centers,k, m);
+    double runtime2 = guy_kmeans<T>(v,centers,k,m);
+    std::cout << "guy: " << runtime2 << ", us: " << runtime1 << std::endl;
+
+   
+    return;
+}
 //./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10
+//./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000 -f bin -t uint8 -m 10
+
 //run with this 
 int main(int argc, char* argv[]){
     //P is the prompt

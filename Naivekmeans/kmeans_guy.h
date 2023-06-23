@@ -47,22 +47,29 @@ template <typename T> double euclidean_squared(const slice<T*,T*>& a, const sequ
 // the 100 in the following two is for granularity control
 // i.e. if the number of dimensions is less than 100, run sequentially
 template <typename T> sequence<T> operator/(const sequence<T>& a, const double b) {
-  return parlay::map(a, [=] (T v) {return v/b;}, 100);}
+  return parlay::map(a, [=] (T v) {return (T) (v/b);}, 100);}
 
 template <typename T> sequence<T> operator/(const point<T>&a, const double b) {
-    return parlay::map(a.coordinates, [=] (T v) {return v/b;}, 100);}
+    return parlay::map(a.coordinates, [=] (T v) {return (T) (v/b);}, 100);}
 
 template <typename T> sequence<T> operator/(const slice<T*,T*>& a, const double b) {
-    return parlay::map(a, [=] (T v) {return v/b;}, 100);}
+    return parlay::map(a, [=] (T v) {return (T) (v/b);}, 100);}
 
 
 template <typename T> sequence<T> operator+(const sequence<T>& a, const sequence<T>& b) {
   if (a.size() == 0) return b;
-  return parlay::tabulate(a.size(), [&] (size_t i) {return a[i] + b[i];}, 100);}
+  return parlay::tabulate(a.size(), [&] (size_t i) {return (T) (a[i] + b[i]);}, 100);}
 
 template <typename T> sequence<T> operator+(const sequence<T>& a, const slice<T*,T*>& b) {
-  if (a.size() == 0) return b;
-  return parlay::tabulate(a.size(), [&] (size_t i) {return a[i] + b[i];}, 100);}
+  return parlay::tabulate(a.size(), [&] (size_t i) {return (T) (a[i] + b[i]);}, 100);}
+
+template <typename T> sequence<T> operator+(const slice<T*,T*>& a, const slice<T*,T*>& b) {
+  return parlay::tabulate(a.size(), [&] (size_t i) {return (T) (a[i] + b[i]);}, 100);}
+
+template <typename T> sequence<T> operator+(const slice<T*,T*>& a, const sequence<T>& b) {
+  return parlay::tabulate(a.size(), [&] (size_t i) {return (T) (a[i] + b[i]);}, 100);}
+
+
 
 template <typename T> size_t guy_closest_point(const point<T>& p, const sequence<center<T>>& kpts) {
   auto a = parlay::delayed::map(kpts, [&] (const center<T> &q) {
@@ -78,8 +85,9 @@ template <typename T> auto addme = parlay::binary_op(addpair<T>, std::pair(seque
 
 
 
-template <typename T> sequence<std::pair<T,size_t>> my_seq_reduce_by_index(sequence<std::pair<point<T>,size_t>> closest, size_t k) {
-    sequence<std::pair<sequence<T>,long>> result(k);
+template <typename T> sequence<std::pair<sequence<T>,size_t>> my_seq_reduce_by_index(sequence<std::pair<point<T>,size_t>> closest, size_t k, size_t d) {
+    sequence<std::pair<sequence<T>,size_t>> result(k,std::make_pair(sequence<T>(d,0),1));
+   
     for (size_t j = 0; j < closest.size(); j++) {
         size_t key = closest[j].second;
         result[key].second+=1;
@@ -99,6 +107,8 @@ template <typename T> std::pair<sequence<center<T>>,double> guy_kmeans(sequence<
     auto timer = parlay::internal::timer();
     timer.start();
   long n = pts.size();
+  assert(n > 0); // need nonempty point size 
+  size_t d = pts[0].coordinates.size();
   
 
   long round = 0;
@@ -111,10 +121,10 @@ template <typename T> std::pair<sequence<center<T>>,double> guy_kmeans(sequence<
     //using a homemade reduce_by_index because
     //reduce_by_index(closest,k,addme<T>) 
     //gives a host of errors because the Monoid is templatted
-    auto mid_and_counts = my_seq_reduce_by_index(closest, k); 
+    sequence<std::pair<sequence<T>,size_t>> mid_and_counts = my_seq_reduce_by_index(closest, k,d); 
 
     // Calculate new centers (average of the points)
-    auto new_kpts = parlay::map(mid_and_counts, [&] (auto mcnt) {
+    auto new_kpts = parlay::map(mid_and_counts, [&] (std::pair<sequence<T>,size_t> mcnt) {
       return (mcnt.first / (double) mcnt.second);});
 
     // compare to previous and quit if close enough

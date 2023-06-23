@@ -3,6 +3,7 @@
 #include "parse_command_line.h"
 
 #include "impshared_4.h"
+#include "kmeans_guy.h"
 
 #include <iostream>
 #include <algorithm>
@@ -20,18 +21,23 @@
 template <typename T>
 inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
    
-    runtime = kmeans_justtime<T>(v, k, m);
+    double epsilon = 0.01;
+    
+    runtime = kmeans_justtime<T>(v, k, m,epsilon);
 
    
     return;
 }
 
+template <typename T>
 void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
-    assert(v.size() > 0) //want a nonempty point set
-    parlay::sequence<center<T>> centers(k) = create_centers(v,v.size(),k,v[0].coordinates.size());
+    assert(v.size() > 0); //want a nonempty point set
+    parlay::sequence<center<T>> centers = create_centers(v,v.size(),k,v[0].coordinates.size());
 
-    double runtime1 = naive_kmeans<T>(v, centers,k, m);
-    double runtime2 = guy_kmeans<T>(v,centers,k,m);
+    double epsilon = 0.01;
+
+    double runtime1 = naive_kmeans<T>(v, centers,k, m,epsilon).second;
+    double runtime2 = guy_kmeans<T>(v,centers,k,m,epsilon).second;
     std::cout << "guy: " << runtime2 << ", us: " << runtime1 << std::endl;
 
    
@@ -78,11 +84,11 @@ int main(int argc, char* argv[]){
     if (ft == "vec") {
         if (tp == "float") { //if the file type is vec and the data type is float, use the parse_fvecs function to get out the points
             parlay::sequence<point<float>> v = parse_fvecs(input.c_str());
-            bench<float>(v, k, max_iterations, runtime); //call kmeans
+            bench_givecenters<float>(v, k, max_iterations, runtime); //call kmeans
         } 
         else if (tp == "uint8") {
             auto v = parse_bvecs(input.c_str());
-            bench<uint8_t>(v, k, max_iterations, runtime);
+            bench_givecenters<uint8_t>(v, k, max_iterations, runtime);
         } else {
             std::cout << "Error: vector type can only be float or uint8. Supplied type is " << tp << "." << std::endl;
             abort();
@@ -91,14 +97,14 @@ int main(int argc, char* argv[]){
     else if (ft == "bin"){
         if (tp == "float") {
             auto v = parse_fbin(input.c_str());
-            bench<float>(v, k, max_iterations, runtime);
+            bench_givecenters<float>(v, k, max_iterations, runtime);
         } else if (tp == "uint8") {
             auto v = parse_uint8bin(input.c_str());
-            bench<uint8_t>(v, k, max_iterations, runtime);
+            bench_givecenters<uint8_t>(v, k, max_iterations, runtime);
         } else if (tp == "int8") {
             auto v = parse_int8bin(input.c_str());
             parlay::sequence<center<int8_t>> centers(k);
-            bench<int8_t>(v, k, max_iterations, runtime);
+            bench_givecenters<int8_t>(v, k, max_iterations, runtime);
         } else {
             // this should actually be unreachable
             std::cout << "Error: bin type can only be float, uint8, or int8. Supplied type is " << tp << "." << std::endl;

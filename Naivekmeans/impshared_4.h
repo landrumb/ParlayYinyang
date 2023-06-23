@@ -52,7 +52,7 @@ template <typename T> void print_point(const point<T>& p) {
 template <typename T> void print_center(const center<T>& c) {
   std::cout << "ID" << c.id << std::endl;
   std::cout <<"COORDS ";
-  for (int i = 0; i < c.dim; i++) {
+  for (int i = 0; i < c.coordinates.size(); i++) {
     std::cout << c.coordinates[i] << " ";
   }
   std::cout<<"Members: ";
@@ -132,13 +132,12 @@ template <typename T> double distanceA(sequence<T> p1, sequence<T> p2,size_t dst
 template<typename T> size_t closest_point(const point<T>& p, sequence<center<T>>& centers) {
 
     assert(centers.size() > 0); //centers must be nonempty
-    assert(centers[0].coordinates.size()==centers[0].dim); //the number of elements in a centerpoint is the dim
     //std::cout << p.coordinates.size() << " " << centers[0].dim << std::endl;
-    assert(p.coordinates.size()==centers[0].dim); //points and centers should have the same # of dimensions
+    assert(p.coordinates.size()==centers[0].coordinates.size()); //points and centers should have the same # of dimensions
 
     sequence<double> distances(centers.size());
     for (int i = 0; i < distances.size(); i++) {
-        distances[i] = distanceA(p.coordinates,make_slice(centers[i].coordinates),0,centers[i].dim);
+        distances[i] = distanceA(p.coordinates,make_slice(centers[i].coordinates),0,centers[i].coordinates.size());
     }
 
   return std::min_element(distances.begin(),distances.end()) - distances.begin();  
@@ -179,7 +178,6 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
     
     sequence<center<T>> new_centers(k);
     for (int i = 0; i < k; i++) {
-        new_centers[i].dim = d;
         new_centers[i].id = i;
         new_centers[i].coordinates=sequence<T>(d,4);
     }
@@ -188,7 +186,6 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
     for (int i = 0; i < n; i++) {
             
         indices[pts[i].best].push_back(i); //it's called best not id!!!
-        new_centers[pts[i].best].add_point(i); // add the point to that center
 
     }
     
@@ -245,7 +242,6 @@ template <typename T> sequence<center<T>> create_centers(const parlay::sequence<
             centers[i].coordinates[j] = pts[starting_coords[i]].coordinates[j];
         }
         centers[i].id=i;
-        centers[i].dim=d;
 
     }
     return centers;

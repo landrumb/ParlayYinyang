@@ -56,7 +56,6 @@ auto parse_uint8bin(const char* filename){
     parlay::sequence<point<uint8_t>> points(num_vectors);
 
     parlay::parallel_for(0, num_vectors, [&] (size_t i) {
-        points[i].id = i; 
 
         uint8_t* start = (uint8_t*)(fileptr + 8 + i*d); //8 bytes at the start for size + dimension
         uint8_t* end = start + d;
@@ -76,7 +75,6 @@ auto parse_int8bin(const char* filename){
     parlay::sequence<point<int8_t>> points(num_vectors);
 
     parlay::parallel_for(0, num_vectors, [&] (size_t i) {
-        points[i].id = i; 
 
         int8_t* start = (int8_t*)(fileptr + 8 + i*d); //8 bytes at the start for size + dimension
         int8_t* end = start + d;
@@ -97,7 +95,6 @@ auto parse_fbin(const char* filename){
     parlay::sequence<point<float>> points(num_vectors);
 
     parlay::parallel_for(0, num_vectors, [&] (size_t i) {
-        points[i].id = i; 
 
         float* start = (float*)(fileptr + 8 + 4*i*d); //8 bytes at the start for size + dimension
         float* end = start + d;
@@ -127,7 +124,6 @@ auto parse_fvecs(const char* filename) {
     size_t offset_in_bytes = vector_size * i + 4;  // skip dimension
     float* start = (float*)(fileptr + offset_in_bytes);
     float* end = start + d;
-    points[i].id = i; 
     points[i].coordinates = parlay::make_slice(start, end);  
   });
 
@@ -151,7 +147,6 @@ auto parse_bvecs(const char* filename) {
     size_t offset_in_bytes = vector_size * i + 4;  // skip dimension
     uint8_t* start = (uint8_t*)(fileptr + offset_in_bytes);
     uint8_t* end = start + d;
-    points[i].id = i; 
     points[i].coordinates = parlay::make_slice(start, end);  
   });
 

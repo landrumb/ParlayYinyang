@@ -140,13 +140,35 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
   while (round < max_iterations) {
     // for each point find closest among the k centers (kpts)
 
-//     sequence<std::pair<point<T>, size_t>> closest =
-//         parlay::map(pts, [&](const point<T>& p) {
-//           return std::pair{p, guy_closest_point(p, centers)};
-//         });  // p note p instead of a (p,1) pair
+//    // 1. Identify for every point, its center and create a
+//    //    sequence of pair<center_id, point_id>
+//    auto pairs = parlay::sequence<std::pair<size_t, size_t>>::uninitialized(n);
+//    parlay::parallel_for(0, n, [&] (size_t i) {
+//      pairs[i] = {guy_closest_point(pts[i], centers), i};
+//    });
+//
+//    // 2. sorting lexicogrpahically. Now all points with the same
+//    //    center are contiguous.
+//    parlay::sort_inplace(pairs);
+//
+//    // 3. Do the reduction over the points coordinates manually.
+//    auto center_flags = parlay::delayed_seq<bool>(n, [&] (size_t i) {
+//      if (i == 0) return true;
+//      return pairs[i].first != pairs[i-1].first;
+//    });
+//    // We now have indices for the start of each center
+//    auto indices = parlay::pack_index(center_flags);
+//
+//    std::cout << "Hello! indices.size() = " << indices.size() << std::endl;
+//
+//    // TODO: aggregate the coordinates for each center, divide by the
+//    // number of points mapped to this center, and compute the new
+//    // coordinates of the center
+//    auto new_coords = sequence<sequence<T>>(k);
 
     // Returns a pair<center id (size_t),   pair<slice<...>, 1l> >
     auto closest = parlay::map(pts, [&](const point<T>& p) {
+      // Explicit copy: wasteful!
       sequence<T> tmp_seq(p.coordinates.size());
       for (size_t i=0; i<p.coordinates.size(); ++i) {
         tmp_seq[i] = p.coordinates[i];
@@ -162,7 +184,7 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
 
 //    // Sum the points that map to each of the k centers
 //    // using a homemade reduce_by_index because
-    auto mid_and_counts = reduce_by_index(closest2, k, addme);
+    auto mid_and_counts = reduce_by_index(closest, k, addme);
 
     // Calculate new centers (average of the points)
     auto new_kpts =

@@ -246,10 +246,7 @@ template <typename T> sequence<center<T>> create_centers(const parlay::sequence<
     return centers;
 }
 
-
-
-
-template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay::sequence<point<T>>& pts, parlay::sequence<center<T>>& centers, size_t k, size_t max_iterations){
+template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay::sequence<point<T>>& pts, parlay::sequence<center<T>>& centers, size_t k, size_t max_iterations, double epsilon){
 
     parlay::internal::timer timer = parlay::internal::timer();
     timer.start();
@@ -260,7 +257,6 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
     }
 
 
-    double epsilon=0.01;
     size_t d = pts[0].coordinates.size();
     size_t n = pts.size();
 
@@ -324,8 +320,8 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
 
 //just get the time out of kmeans
 //centers created internally
-template <typename T> double kmeans_justtime(parlay::sequence<point<T>>& pts, size_t k, size_t max_iterations){
+template <typename T> double kmeans_justtime(parlay::sequence<point<T>>& pts, size_t k, size_t max_iterations, double epsilon){
     if (pts.size()==0) return -1;
     sequence<center<T>> centers = create_centers(pts,pts.size(),k,pts[0].coordinates.size());
-    return naive_kmeans(pts,centers,k,max_iterations).second;
+    return naive_kmeans(pts,centers,k,max_iterations,epsilon).second;
 }

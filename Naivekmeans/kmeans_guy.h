@@ -81,7 +81,7 @@ template <typename T> auto addme = parlay::binary_op(addpair<T>, std::pair(seque
 template <typename T> sequence<std::pair<T,size_t>> my_seq_reduce_by_index(sequence<std::pair<point<T>,size_t>> closest, size_t k) {
     sequence<std::pair<sequence<T>,long>> result(k);
     for (size_t j = 0; j < closest.size(); j++) {
-        size_t key = closest[j].first.best;
+        size_t key = closest[j].second;
         result[key].second+=1;
         result[key].first = result[key].first + closest[j].first.coordinates;
     }
@@ -104,8 +104,8 @@ template <typename T> std::pair<sequence<center<T>>,double> guy_kmeans(sequence<
   long round = 0;
   while (round < max_iterations) {
     // for each point find closest among the k centers (kpts)
-    sequence<std::pair<size_t, point<T>>> closest = parlay::map(pts, [&] (const point<T>& p) {
-      return std::pair{guy_closest_point(p, centers),p};}); //p note p instead of a (p,1) pair
+    sequence<std::pair<point<T>,size_t>> closest = parlay::map(pts, [&] (const point<T>& p) {
+      return std::pair{p,guy_closest_point(p, centers)};}); //p note p instead of a (p,1) pair
 
     // Sum the points that map to each of the k centers
     //using a homemade reduce_by_index because

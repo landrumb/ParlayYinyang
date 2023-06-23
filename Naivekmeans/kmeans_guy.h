@@ -97,15 +97,6 @@ size_t guy_closest_point(const point<T>& p, const sequence<center<T>>& kpts) {
   return min_element(a) - a.begin();
 }
 
-template <typename T>
-auto addpair = [](const std::pair<sequence<T>, long>& a,
-                  const std::pair<sequence<T>, long>& b) {
-  return std::pair(a.first + b.first, a.second + b.second);
-};
-
-template <typename T>
-auto addme = parlay::binary_op(addpair<T>, std::pair(sequence<T>(), 0l));
-
 // template <typename T> sequence<std::pair<T,size_t>>
 // my_seq_reduce_by_index(sequence<std::pair<point<T>,size_t>> closest, size_t
 // k) {
@@ -149,17 +140,29 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
   while (round < max_iterations) {
     // for each point find closest among the k centers (kpts)
 
-    sequence<std::pair<point<T>, size_t>> closest =
-        parlay::map(pts, [&](const point<T>& p) {
-          return std::pair{p, guy_closest_point(p, centers)};
-        });  // p note p instead of a (p,1) pair
+//     sequence<std::pair<point<T>, size_t>> closest =
+//         parlay::map(pts, [&](const point<T>& p) {
+//           return std::pair{p, guy_closest_point(p, centers)};
+//         });  // p note p instead of a (p,1) pair
 
-    // Sum the points that map to each of the k centers
-    // using a homemade reduce_by_index because
-    reduce_by_index(closest, k, addme<T>);
-    // gives a host of errors because the Monoid is templatted
-    // sequence<std::pair<sequence<T>,size_t>> mid_and_counts =
-    // my_seq_reduce_by_index(closest, k,d);
+    // Returns a pair<center id (size_t),   pair<slice<...>, 1l> >
+    auto closest = parlay::map(pts, [&](const point<T>& p) {
+      sequence<T> tmp_seq(p.coordinates.size());
+      for (size_t i=0; i<p.coordinates.size(); ++i) {
+        tmp_seq[i] = p.coordinates[i];
+      }
+      return std::pair{guy_closest_point(p, centers), std::make_pair(tmp_seq, 1l)};
+    });  // p note p instead of a (p,1) pair
+
+    auto addpair = [](const std::pair<sequence<T>, long>& a,
+                      const std::pair<sequence<T>, long>& b) {
+      return std::pair(a.first + b.first, a.second + b.second);
+    };
+    auto addme = parlay::binary_op(addpair, std::pair(sequence<T>(), 0l));
+
+//    // Sum the points that map to each of the k centers
+//    // using a homemade reduce_by_index because
+    auto mid_and_counts = reduce_by_index(closest2, k, addme);
 
     // Calculate new centers (average of the points)
     auto new_kpts =

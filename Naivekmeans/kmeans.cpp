@@ -33,19 +33,71 @@ inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, double &run
 template <typename T>
 void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
     assert(v.size() > 0); //want a nonempty point set
-    parlay::sequence<center<T>> centers = create_centers(v,v.size(),k,v[0].coordinates.size());
+    size_t n = v.size();
+    size_t d = v[0].coordinates.size();
+    std::cout << "d: " << d << std::endl;
 
+    //forcibly making some doubles here
+    sequence<point<double>> v2(n);
+    for (int i = 0; i < n; i++) {
+        v2[i] = point<double>();
+        v2[i].best = -1;
+        
+        sequence<double>* temp = new sequence<double>(d);
+        for (int j = 0; j < d; j++) {
+            (*temp)[j] = static_cast<double>(v[i].coordinates[j]);
+        } 
+        v2[i].coordinates = make_slice(*temp);
+    }
+
+    parlay::sequence<center<double>> centers = create_centers(v2,n,k,d);
+
+    print_point(v[0]);
+    print_point(v[1]);
+
+    //need to properly copy the centers because we are passing by ref
+    parlay::sequence<center<double>> centers2(k,center<double>()); 
+    for (int i = 0; i < k; i++) {
+        centers2[i].id = centers[i].id;
+        centers2[i].coordinates=sequence<double>(d);
+        for (int j = 0; j < d; j++) {
+            centers2[i].coordinates[j] = centers[i].coordinates[j];
+        }
+    }
+
+    // std::cout << "points: " << std::endl;
+    // for (int i = 0; i < n; i++) {
+    //     print_point(v[i]);
+    // }
+
+    std::cout << "centers: " << std::endl;
+    for (int i = 0; i < k; i++) {
+       print_center(centers[i]);
+       print_center(centers2[i]);
+        
+    }
+    
     double epsilon = 0.01;
 
-    double runtime1 = naive_kmeans<T>(v, centers,k, m,epsilon).second;
-    double runtime2 = guy_kmeans<T>(v,centers,k,m,epsilon).second;
+    std::cout << "started the first kmeans\n";;
+
+
+    double runtime1 = naive_kmeans<double>(v2, centers,k, m,epsilon).second;
+    std::cout << "finished the first kmeans\n";
+    double runtime2 = guy_kmeans<double>(v2,centers2,k,m,epsilon).second;
     std::cout << "guy: " << runtime2 << ", us: " << runtime1 << std::endl;
+    std::cout << "centers: " << std::endl;
+    for (int i = 0; i < k; i++) {
+        std::cout << "i:\n";
+        print_center(centers[i]);
+        print_center(centers2[i]);
+    }
 
    
     return;
 }
-//./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10
-//./kmeans -k 10 -i ../base.1B.u8bin.crop_nb_1000 -f bin -t uint8 -m 10 
+//./kmeans -k 10 -i ../Data/base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10
+//./kmeans -k 10 -i ../Data/base.1B.u8bin-16.crop_nb_1000 -f bin -t uint8 -m 10 
 
 //run with this 
 int main(int argc, char* argv[]){
@@ -96,11 +148,13 @@ int main(int argc, char* argv[]){
         }
     } 
     else if (ft == "bin"){
+        std::cout << "bin input\n";
         if (tp == "float") {
             auto v = parse_fbin(input.c_str());
             bench_givecenters<float>(v, k, max_iterations, runtime);
         } else if (tp == "uint8") {
             auto v = parse_uint8bin(input.c_str());
+            std::cout << "going for a uint8 bin input" << std::endl;
             bench_givecenters<uint8_t>(v, k, max_iterations, runtime);
         } else if (tp == "int8") {
             auto v = parse_int8bin(input.c_str());

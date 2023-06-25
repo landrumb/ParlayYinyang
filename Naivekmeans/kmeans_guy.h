@@ -138,6 +138,11 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
 
   long round = 0;
   while (round < max_iterations) {
+
+      std::cout << "centers: " << round << std::endl;
+    for (int i = 0; i < k; i++) {
+       print_center(centers[i]);        
+    }
     // for each point find closest among the k centers (kpts)
 
 //    // 1. Identify for every point, its center and create a
@@ -176,6 +181,7 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
       return std::pair{guy_closest_point(p, centers), std::make_pair(tmp_seq, 1l)};
     });  // p note p instead of a (p,1) pair
 
+
     auto addpair = [](const std::pair<sequence<T>, long>& a,
                       const std::pair<sequence<T>, long>& b) {
       return std::pair(a.first + b.first, a.second + b.second);
@@ -185,6 +191,13 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
 //    // Sum the points that map to each of the k centers
 //    // using a homemade reduce_by_index because
     auto mid_and_counts = reduce_by_index(closest, k, addme);
+
+    std::cout << "outputting mid and counts" << std::endl;
+    for (int i = 0; i < k; i++) {
+      std::cout << mid_and_counts[i].second << std::endl;
+      print_seq(mid_and_counts[i].first);
+      std::cout << std::endl;
+    }
 
     // Calculate new centers (average of the points)
     auto new_kpts =

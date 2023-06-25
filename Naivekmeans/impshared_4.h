@@ -22,49 +22,6 @@ using namespace parlay;
 template<typename T> std::pair<T,size_t> anti_overflow_avg_help(const sequence<T> &seq, size_t start, size_t end);
 template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay::sequence<point<T>>& pts, size_t k, size_t max_iterations, double epsilon);
 
-sequence<size_t> randseq(size_t n, size_t k){
-    assert(n > k);
-    std::random_device randomizer;
-    std::mt19937 generate(randomizer());
-   // std::uniform_int_distribution<size_t> dis(1, n);
-
-    sequence<size_t> random_numbers(k);
-    size_t bucket = n / k;
-
-    parallel_for(0, k, [&](size_t i){
-         std::uniform_int_distribution<size_t> dis(bucket * i, bucket * (i+1) - 1);
-        random_numbers[i] = dis(generate);
-    });
-  
-
-  return random_numbers;
-}
-
-template <typename T> void print_point(const point<T>& p) {
-  std::cout << "Po: " << p.id << " " << p.best << std::endl;
-  for (T* i = p.coordinates.begin(); i != p.coordinates.end(); i = std::next(i) ) {
-    std::cout << *i << " ";
-  }
-  std::cout << std::endl;
-}
-
-template <typename T> void print_center(const center<T>& c) {
-  std::cout << "ID" << c.id << std::endl;
-  std::cout <<"COORDS ";
-  for (int i = 0; i < c.coordinates.size(); i++) {
-    std::cout << c.coordinates[i] << " ";
-  }
-  std::cout<<"Members: ";
-  std::cout << std::endl; //lol lifehack change type based on error msg
-  for (std::set<size_t>::const_iterator i = c.points.begin(); i != c.points.end(); i=std::next(i)) {
-    std::cout << *i << " ";
-
-
-  }
-  std::cout << std::endl;
-  
-}
-
 //hmm have to pass by value? why? (double vs const double error)
 //version of distance that works with slices
 template <typename T> double distanceA(slice<T*,T*> p1, slice<T*,T*> p2,size_t dstart, size_t dend) {
@@ -187,6 +144,11 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
         indices[pts[i].best].push_back(i); //it's called best not id!!!
 
     }
+
+    std::cout << "Debugging: printing out center counts:\n";
+    for (int i = 0; i < k; i++) {
+      std::cout << indices[i].size() << std::endl;
+    }
     
     parlay::parallel_for (0, k*d, [&] (size_t icoord){
         size_t i = icoord / d;
@@ -196,8 +158,8 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
         //new_centers[i].coordinates[coord] = anti_overflow_avg(map(new_centers[i].points,[&] (size_t ind) {return pts[ind].coordinates[coord];}  ));
 
         //if there are no values in a certain center, just keep the center where it is
-        if (indices[i].size() > 0) {
-            new_centers[i].coordinates[coord] = anti_overflow_avg(map(indices[i],[&] (size_t ind) {return pts[ind].coordinates[coord];}  ));
+        if (indices[i].size() > 0) { //anti_overflow_avg or reduce??
+            new_centers[i].coordinates[coord] = reduce(map(indices[i],[&] (size_t ind) {return pts[ind].coordinates[coord];})) / indices[i].size(); //normal averaging now
 
         }
         else { 
@@ -219,12 +181,7 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
 //choose the starting centers randomly
 //the use of n/k guarantees we won't pick the same point twice as a center    
 template <typename T> sequence<center<T>> create_centers(const parlay::sequence<point<T>>& pts,size_t n, size_t k, size_t d) {
-    parlay::random_generator gen;
-    //std::uniform_int_distribution<> dis(0, n/k);
-    // sequence<size_t> starting_coords = tabulate(k,[&] (size_t i) {
-    //     size_t r = 1;
-    //     return (n/k)*i+r;
-    // });
+
     sequence<size_t> starting_coords = randseq(n,k);
 
     std::cout << "starting coords" << std::endl;
@@ -236,7 +193,7 @@ template <typename T> sequence<center<T>> create_centers(const parlay::sequence<
     // Initialize centers randomly
     sequence<center<T>> centers(k);
     for (int i = 0; i < k; i++) {
-        centers[i].coordinates = parlay::sequence<T>(d, 0);
+        centers[i].coordinates = parlay::sequence<T>(d);
         for (size_t j = 0; j < d; j++) {
             centers[i].coordinates[j] = pts[starting_coords[i]].coordinates[j];
         }
@@ -260,12 +217,22 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
     size_t d = pts[0].coordinates.size();
     size_t n = pts.size();
 
+    // sequence<center<double>> working_centers = tabulate(k, [&](size_t i) {
+    //   sequence<double> temp = tabulate(d,[&] (size_t j) {return static_cast<double>(centers[i].coordinates[j]);}  ); //sequence we are using
+    //   return center<double>(i,temp);
+    // });
+
 
   int iterations = 0;
 
   double total_diff = 0;
 
   while (iterations < max_iterations) {
+
+     std::cout << "centers: " << iterations << std::endl;
+    for (int i = 0; i < k; i++) {
+       print_center(centers[i]);        
+    }
 
    
     std::cout << "iter" << iterations << std::endl;
@@ -285,7 +252,7 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
     std::cout << "past closest pt\n";
 
     // Compute new centers
-    sequence<center<T>> new_centers = compute_centers(pts, centers, k, d, n);
+    sequence<center<double>> new_centers = compute_centers(pts, centers, k, d, n);
 
     // Check convergence
     total_diff = 0.0;
@@ -310,6 +277,14 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
   // }
   std::cout << "Error" << total_diff << std::endl;
   std::cout << std::endl << std::endl;
+
+  //copy working_centers back into centers
+  // for (size_t i = 0; i < k; i++) {
+  //   for (size_t j = 0; j < d; j++) {
+  //       centers[i].coordinates[j] = (T) working_centers[i].coordinates[j];
+
+  //   }
+  // }
     
 
   return std::make_pair(centers,timer.total_time());

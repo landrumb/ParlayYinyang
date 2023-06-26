@@ -2,7 +2,11 @@
 #include "parse_files.h"
 #include "parse_command_line.h"
 
+<<<<<<< HEAD
 #include "impshared_4_stats.h"
+=======
+#include "impshared_4.h"
+>>>>>>> c48c5e5de84387f7d5e561e8124a0dda382239bd
 //#include "kmeans_guy.h"
 
 #include <iostream>
@@ -33,11 +37,11 @@ template <typename T>
 void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
     assert(v.size() > 0); //want a nonempty point set
     parlay::sequence<center<T>> centers = create_centers(v,v.size(),k,v[0].coordinates.size());
-
    
     double epsilon = 0.01;
 
     double runtime1 = naive_kmeans_stats<T>(v, centers,k, m,epsilon);
+
     //double runtime2 = guy_kmeans<T>(v,centers,k,m,epsilon).second;
     std::cout << "guy: " << runtime1 << ", us: " << runtime1 << std::endl;
 

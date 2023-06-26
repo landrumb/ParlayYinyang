@@ -131,7 +131,11 @@ template <typename T> double distanceA(sequence<T> p1, sequence<T> p2,size_t dst
 //note: removed const from centers
 
 template<typename T> 
+<<<<<<< HEAD
 std::pair<size_t, size_t> closest_point_stats(const point<T>& p, sequence<center<T>>& centers) {
+=======
+pair<size_t, size_t> closest_point_stats(const point<T>& p, sequence<center<T>>& centers) {
+>>>>>>> c48c5e5de84387f7d5e561e8124a0dda382239bd
 
     assert(centers.size() > 0); //centers must be nonempty
     //std::cout << p.coordinates.size() << " " << centers[0].dim << std::endl;
@@ -143,7 +147,11 @@ std::pair<size_t, size_t> closest_point_stats(const point<T>& p, sequence<center
         calls++;
     }
 
+<<<<<<< HEAD
   return std::make_pair(std::min_element(distances.begin(),distances.end()) - distances.begin(), calls);  
+=======
+  return make_pair(std::min_element(distances.begin(),distances.end()) - distances.begin(), calls);  
+>>>>>>> c48c5e5de84387f7d5e561e8124a0dda382239bd
 
 }
 
@@ -255,7 +263,9 @@ template <typename T> sequence<center<T>> create_centers(const parlay::sequence<
 
 
 // }
+
 template<typename it, typename s>
+
 size_t sum_of_dist( slice<it,s> S, size_t n){
     if (n == 1){
         return *S.begin();
@@ -275,8 +285,10 @@ template <typename T> double kmeans_justtime(parlay::sequence<point<T>>& pts, si
     return naive_kmeans_stats(pts,k,max_iterations).second;
 }
 
+
 template <typename T> 
 double naive_kmeans_stats(parlay::sequence<point<T>>& pts, size_t k, size_t max_iterations){
+
 
     parlay::internal::timer timer = parlay::internal::timer();
     timer.start();
@@ -313,6 +325,7 @@ double naive_kmeans_stats(parlay::sequence<point<T>>& pts, size_t k, size_t max_
 
     // Assign each point to the closest center
     parlay::parallel_for(0, pts.size(), [&](size_t i) {
+
       std::pair<size_t,size_t> closest_pair = closest_point_stats(pts[i], centers);
       pts[i].best = closest_pair.first;
       curr_stat.dist_calls[iterations] += closest_pair.second;
@@ -331,6 +344,7 @@ double naive_kmeans_stats(parlay::sequence<point<T>>& pts, size_t k, size_t max_
     }
 
     sequence<double> dists(n);
+
     dists = parlay::map(pts, [&](point<T> p){
         return distanceA(p.coordinates, centers[p.best].coordinates, 0, d);
     });
@@ -339,6 +353,7 @@ double naive_kmeans_stats(parlay::sequence<point<T>>& pts, size_t k, size_t max_
 
     std::cout << "stats of iteration " << iterations << ": " << std::endl << "Distance calls: " << 
     curr_stat.dist_calls[iterations] << std::endl << "SSE: " << curr_stat.SSE[iterations] << std::endl;
+
 
     centers = std::move(new_centers);
 

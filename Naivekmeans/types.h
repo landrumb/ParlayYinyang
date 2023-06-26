@@ -27,6 +27,15 @@
 /* 
     It's desirable that the point struct not handle much clustering-implementation-specific logic so parsing code can be easily reused
  */
+
+
+struct stats {
+    parlay::sequence<size_t> dist_calls;
+    parlay::sequence<double> SSE;
+    parlay::sequence<double> runtimes;
+    double total_runtime;
+};
+
 template <typename T>
 struct point {
 

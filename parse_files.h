@@ -74,7 +74,7 @@ auto parse_int8bin(const char* filename){
 
     int num_vectors = *((int*) fileptr);
     int d = *((int*) (fileptr+4));
-
+ 
     std::cout << "Detected " << num_vectors << " points with dimension " << d << std::endl;
     parlay::sequence<point<int8_t>> points(num_vectors);
 

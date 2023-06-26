@@ -6,7 +6,7 @@ JEMALLOC = -L$(JEMALLOCLD) -ljemalloc
 endif
 
 CCFLAGS = -mcx16 -O3 -std=c++17 -march=native -DNDEBUG -I .
-CLFLAGS = -ldl $(JEMALLOC) -lstdc++
+CLFLAGS = -ldl $(JEMALLOC) 
 
 OMPFLAGS = -DPARLAY_OPENMP -fopenmp
 CILKFLAGS = -DPARLAY_CILK -fcilkplus
@@ -23,7 +23,7 @@ CFLAGS = $(CILKFLAGS) $(CCFLAGS)
 LFLAGS = $(CILKFLAGS) $(CLFLAGS)
 
 else
-CC = gcc-13
+CC = g++
 CFLAGS = $(PBBFLAGS) $(CCFLAGS)
 LFLAGS = $(PBBFLAGS) $(CLFLAGS)
 endif

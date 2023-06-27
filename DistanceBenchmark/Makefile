@@ -27,18 +27,18 @@ INCLUDE = -I /parlay/ -I .
 
 all: distcheck
 
-distcheck: distanceBenchmark.cc NSGdist.h types.h
+distcheck: distanceBenchmark.cc NSGDist.h types.h
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o distcheck distanceBenchmark.cc 
 
-dist_test: distanceTest.cc NSGdist.h
+dist_test: distanceTest.cc NSGDist.h
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS) -o dist_test distanceTest.cc
 
-andrew_distcheck: distanceBenchmark.cc NSGdist.h types.h
+andrew_distcheck: distanceBenchmark.cc NSGDist.h types.h
 	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS)  -o distcheck distanceBenchmark.cc 
 
-andrew_dist_test: distanceTest.cc NSGdist.h
+andrew_dist_test: distanceTest.cc NSGDist.h
 	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS) -o dist_test distanceTest.cc
 
 
 clean:
-	rm -f distcheck
+	rm -f distcheck dist_test andrew_dist_test andrew_distcheck

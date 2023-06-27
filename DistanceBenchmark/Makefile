@@ -30,6 +30,9 @@ all: distcheck
 distcheck: distanceBenchmark.cc NSGdist.h types.h
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o distcheck distanceBenchmark.cc 
 
+dist_test: distanceTest.cc NSGdist.h
+	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS) -o dist_test distanceTest.cc
+
 andrew_distcheck: distanceBenchmark.cc NSGdist.h types.h
 	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS)  -o distcheck distanceBenchmark.cc 
 

@@ -25,21 +25,17 @@ ANDREW_FLAGS = $(ANDREW_CC) $(CFLAGS) $(ANDREW_LFLAGS)
 
 INCLUDE = -I /parlay/ -I .
 
-all: kmeans
+all: distcheck
 
-kmeans: kmeans.cpp impshared_4.h 
-	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans kmeans.cpp  
+distcheck: distanceBenchmark.cc NSGdist.h types.h
+	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o distcheck distanceBenchmark.cc 
 
-kmeans_stats: kmeans_stats.cpp impshared_4_stats.h 
-	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans kmeans_stats.cpp  
+andrew_distcheck: distanceBenchmark.cc NSGdist.h types.h
+	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS)  -o distcheck distanceBenchmark.cc 
 
-andrew_kmeans: kmeans.cpp impshared_4.h
-
-	$(ANDREW_FLAGS)  -o kmeans kmeans.cpp  
-
-a_kmeans_5: kmeans.cpp impshared_5.h
-	$(ANDREW_FLAGS)  -o kmeans kmeans.cpp 
+andrew_dist_test: distanceTest.cc NSGdist.h
+	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS) -o dist_test distanceTest.cc
 
 
 clean:
-	rm -f kmeans
+	rm -f distcheck

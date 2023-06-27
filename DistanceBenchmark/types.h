@@ -141,37 +141,4 @@ template<> void print_seq <uint8_t> (parlay::sequence<uint8_t> seq) {
 
 }
 
-template <typename T>
-double euclidean_squared(const parlay::sequence<T>& a, const parlay::sequence<T>& b) {
-  return parlay::reduce(parlay::delayed::tabulate(a.size(), [&](long i) {
-    auto d = a[i] - b[i];
-    return d * d;
-  }));
-}
-
-template <typename T>
-double euclidean_squared(const parlay::slice<T*, T*>& a, const parlay::sequence<T>& b) {
-  return parlay::reduce(parlay::delayed::tabulate(a.size(), [&](long i) {
-    auto d = a[i] - b[i];
-    return d * d;
-  }));
-}
-
-template <typename T>
-double euclidean_squared(const parlay::slice<T*, T*> a, const parlay::slice<T*,T*> b) {
-  return parlay::reduce(parlay::delayed::tabulate(a.size(), [&](long i) {
-    auto d = a[i] - b[i];
-    return d * d;
-  }));
-}
-
-double euclidean_squared(const double a[], const parlay::sequence<double>& b) {
-    return parlay::reduce(parlay::delayed::tabulate(b.size(), [&](long i) {
-    auto d = a[i] - b[i];
-    return d * d;
-  }));
-
-}
-
-
 #endif

@@ -4,9 +4,6 @@
 //note that the Distance function isn't finish so using a homemade distance function, can add the distance formatting later
 //Andrew, Mohammed, Papa
 
-//print out a ton of debug info if true
-bool DEBUG = false;
-
 #include "types.h"
 
 
@@ -82,7 +79,6 @@ template <typename T> double distanceA(sequence<T> p1, sequence<T> p2,size_t dst
    
 }
 
-
 //finds the closest point utilizing the minimum distance
 //inspiration from Guy's nice mapping (essential copy)
 //@param p: a point 
@@ -101,24 +97,6 @@ template<typename T> size_t closest_point(const point<T>& p, sequence<center<T>>
     }
 
   return std::min_element(distances.begin(),distances.end()) - distances.begin();  
-
-}
-
-
-//put the coordinates of p onto the stack for the calculation
-template<typename T> size_t closest_point_convert(const point<T>& p, sequence<center<T>>& centers) {
-    assert(centers.size() > 0);
-    assert(p.coordinates.size() == centers[0].coordinates.size());
-    double buf[p.coordinates.size()];
-    T* it = p.begin();
-    for (int i = 0; i < p.coordinates.size(); i++) {
-        buf[i]=*it;
-        it = it.next();
-    }
-    auto distances = parlay::delayed::map(centers, [&](const center<T>& q) {
-        return euclidean_squared(buf, q.coordinates);
-    });
-    return min_element(distances) - distances.begin();
 
 }
 
@@ -166,14 +144,11 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
         indices[pts[i].best].push_back(i); //it's called best not id!!!
 
     }
-    if (DEBUG) {
-        std::cout << "Debugging: printing out center counts:\n";
-        for (int i = 0; i < k; i++) {
-        std::cout << indices[i].size() << std::endl;
-        }
 
+    std::cout << "Debugging: printing out center counts:\n";
+    for (int i = 0; i < k; i++) {
+      std::cout << indices[i].size() << std::endl;
     }
-    
     
     parlay::parallel_for (0, k*d, [&] (size_t icoord){
         size_t i = icoord / d;
@@ -208,15 +183,12 @@ template<typename T> sequence<center<T>> compute_centers(const sequence<point<T>
 template <typename T> sequence<center<T>> create_centers(const parlay::sequence<point<T>>& pts,size_t n, size_t k, size_t d) {
 
     sequence<size_t> starting_coords = randseq(n,k);
-    if (DEBUG) {
-        std::cout << "starting coords" << std::endl;
-        for (int i = 0; i < k; i++) {
-            std::cout << starting_coords[i] << std::endl;
-        }
-        std::cout << std::endl;
 
+    std::cout << "starting coords" << std::endl;
+    for (int i = 0; i < k; i++) {
+        std::cout << starting_coords[i] << std::endl;
     }
-    
+    std::cout << std::endl;
 
     // Initialize centers randomly
     sequence<center<T>> centers(k);
@@ -235,7 +207,6 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
 
     parlay::internal::timer timer = parlay::internal::timer();
     timer.start();
-
     std::cout << "running" << std::endl;
 
      if(pts.size() == 0){ //default case
@@ -258,14 +229,10 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
 
   while (iterations < max_iterations) {
 
-    if (DEBUG) {
-         std::cout << "centers: " << iterations << std::endl;
+     std::cout << "centers: " << iterations << std::endl;
     for (int i = 0; i < k; i++) {
        print_center(centers[i]);        
     }
-
-    }
-    
 
    
     std::cout << "iter" << iterations << std::endl;
@@ -303,16 +270,13 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
     }
     
   }
-    if (DEBUG) {
-         std::cout << "center printing" << std::endl;
-  for (int i = 0; i < k; i++) {
-    print_center(centers[i]);
-  }
+
+   std::cout << "center printing" << std::endl;
+  // for (int i = 0; i < k; i++) {
+  //   print_center(centers[i]);
+  // }
   std::cout << "Error" << total_diff << std::endl;
   std::cout << std::endl << std::endl;
-
-    }
-  
 
   //copy working_centers back into centers
   // for (size_t i = 0; i < k; i++) {

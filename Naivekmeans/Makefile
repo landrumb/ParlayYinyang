@@ -40,8 +40,11 @@ a_kmeans4: kmeans.cpp impshared_4.h kmeans_guy.h types.h
 # a_kmeans5: kmeans.cpp impshared_5.h types.h NSGDist.h
 # 	$(ANDREW_FLAGS)  -o kmeans5 kmeans_improved.cpp
 
-kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_centers.h impshared_4.h kmeans_guy.h types.h
+a_kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_centers.h impshared_4.h kmeans_guy.h types.h
 	$(ANDREW_FLAGS)  -o kmeans_integrated kmeans_integrated.cpp  
+
+kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_centers.h impshared_4.h kmeans_guy.h types.h
+	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans_integrated kmeans_integrated.cpp  
 
 clean:
 	rm -f kmeans kmeans4 kmeans5 kmeans_integrated

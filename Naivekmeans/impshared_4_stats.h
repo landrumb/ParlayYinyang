@@ -131,11 +131,8 @@ template <typename T> double distanceA(sequence<T> p1, sequence<T> p2,size_t dst
 //note: removed const from centers
 
 template<typename T> 
-<<<<<<< HEAD
 std::pair<size_t, size_t> closest_point_stats(const point<T>& p, sequence<center<T>>& centers) {
-=======
-pair<size_t, size_t> closest_point_stats(const point<T>& p, sequence<center<T>>& centers) {
->>>>>>> c48c5e5de84387f7d5e561e8124a0dda382239bd
+
 
     assert(centers.size() > 0); //centers must be nonempty
     //std::cout << p.coordinates.size() << " " << centers[0].dim << std::endl;
@@ -147,11 +144,8 @@ pair<size_t, size_t> closest_point_stats(const point<T>& p, sequence<center<T>>&
         calls++;
     }
 
-<<<<<<< HEAD
   return std::make_pair(std::min_element(distances.begin(),distances.end()) - distances.begin(), calls);  
-=======
-  return make_pair(std::min_element(distances.begin(),distances.end()) - distances.begin(), calls);  
->>>>>>> c48c5e5de84387f7d5e561e8124a0dda382239bd
+
 
 }
 

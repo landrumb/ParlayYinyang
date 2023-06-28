@@ -1,3 +1,8 @@
 kmeans
 errors.txt
 .vscode/settings.json
+
+Naivekmeans/kmeans4
+Naivekmeans/kmeans5
+DistanceBenchmark/dist_test
+DistanceBenchmark/distcheck

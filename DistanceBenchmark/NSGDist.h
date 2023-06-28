@@ -37,7 +37,7 @@ namespace efanna2e{
     public:
         float compare(const float* a, const float* b, unsigned size) const {
 
-          std::cout << "in this function compare\n";
+          //std::cout << "in this function compare\n";
             float result = 0;
 
 #ifdef __GNUC__
@@ -66,14 +66,14 @@ namespace efanna2e{
       if(DR){AVX_L2SQR(e_l, e_r, sum, l0, r0);}
 
       for (unsigned i = 0; i < DD; i += 16, l += 16, r += 16) {
-        std::cout << "in this for loop\n";
+        //std::cout << "in this for loop\n";
       	AVX_L2SQR(l, r, sum, l0, r0);
       	AVX_L2SQR(l + 8, r + 8, sum, l1, r1); //commenting this one
       }
       _mm256_storeu_ps(unpack, sum);
-      std::cout << "unpacking result 8 here\n";
-      std::cout << unpack[0] << " " << unpack[1] << " " << unpack[2] << " " << unpack[3] << std::endl;
-      std::cout << unpack[4] << " " << unpack[5] << " " << unpack[6] << " " << unpack[7] << std::endl;
+      // std::cout << "unpacking result 8 here\n";
+      // std::cout << unpack[0] << " " << unpack[1] << " " << unpack[2] << " " << unpack[3] << std::endl;
+      // std::cout << unpack[4] << " " << unpack[5] << " " << unpack[6] << " " << unpack[7] << std::endl;
 
       result = unpack[0] + unpack[1] + unpack[2] + unpack[3] + unpack[4] + unpack[5] + unpack[6] + unpack[7];
 
@@ -116,7 +116,7 @@ namespace efanna2e{
       SSE_L2SQR(l + 12, r + 12, sum, l3, r3);
   }
   _mm_storeu_ps(unpack, sum);
-  std::cout << "doing a 4 unpack\n";
+  //std::cout << "doing a 4 unpack\n";
   result += unpack[0] + unpack[1] + unpack[2] + unpack[3];
 
 //normal distance
@@ -126,7 +126,7 @@ namespace efanna2e{
       const float* last = a + size;
       const float* unroll_group = last - 3;
 
-      std::cout << "in the else block" << std::endl;
+     // std::cout << "in the else block" << std::endl;
 
       /* Process 4 items with each loop for efficiency. */
       while (a < unroll_group) {
@@ -410,7 +410,7 @@ struct Euclidian_Distance : public Distance{
   }
 
   float distance(float *p, float *q, unsigned d){
-      std::cout << "doing float distance pqd " << *p << " " << *q << " " << d << std::endl;
+      //std::cout << "doing float distance pqd " << *p << " " << *q << " " << d << std::endl;
       efanna2e::DistanceL2 distfunc;
       return distfunc.compare(p, q, d);
   }

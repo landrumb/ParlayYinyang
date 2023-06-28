@@ -73,7 +73,7 @@ double nsg_distance(const parlay::slice<T*,T*>& a, const parlay::slice<T*,T*> b)
 
 
 int main() {
-    int n = 14;
+    int n = 1000;
     int maxval = 100;
 
     srand(time(0));

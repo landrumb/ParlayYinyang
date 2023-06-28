@@ -46,5 +46,9 @@ a_kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_cente
 kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_centers.h impshared_4.h kmeans_guy.h types.h
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans_integrated kmeans_integrated.cpp  
 
+a_debug_nsg: debug_nsg.cc NSGDist.h
+	$(ANDREW_FLAGS) -o debug_nsg debug_nsg.cc
+
+
 clean:
-	rm -f kmeans kmeans4 kmeans5 kmeans_integrated
+	rm -f kmeans kmeans4 kmeans5 kmeans_integrated debug_nsg

@@ -126,20 +126,22 @@ parlay::sequence<size_t> randseq(size_t n, size_t k){
 }
 
 
-template<typename T> void print_seq(parlay::sequence<T> seq) {
+template<typename T> void print_seq(parlay::sequence<T>& seq) {
     for (int i = 0; i < seq.size(); i++) {
         std::cout << seq[i] << " ";
     }
     std::cout << std::endl;
 }
 
-template<> void print_seq <uint8_t> (parlay::sequence<uint8_t> seq) {
+template<> void print_seq <uint8_t> (parlay::sequence<uint8_t>& seq) {
      for (int i = 0; i < seq.size(); i++) {
         std::cout << static_cast<int>(seq[i]) << " ";
     }
     std::cout << std::endl;
 
 }
+
+
 
 template <typename T>
 double euclidean_squared(const parlay::sequence<T>& a, const parlay::sequence<T>& b) {

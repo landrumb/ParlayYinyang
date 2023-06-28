@@ -7,7 +7,7 @@
 
 #include "impshared_4.h"
 #include "imp_with_euc_dist.h"
-//#include "imp_vectorized_distances.h"
+#include "imp_vectorized_distances.h"
 #include "imp_doubled_centers.h"
 #include "kmeans_guy.h"
 
@@ -255,6 +255,76 @@ void bench_no_double_conversion(parlay::sequence<point<T>> &v, size_t k, size_t 
     return;
 }
 
+
+//bench without a pre-conversion of the points to doubles
+template <typename T>
+void bench_vd(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime, bool DEBUG_main){
+    assert(v.size() > 0); //want a nonempty point set
+    size_t n = v.size();
+    size_t d = v[0].coordinates.size();
+    std::cout << "d: " << d << std::endl;
+
+    parlay::sequence<center<T>> centers = create_centers(v,n,k,d);
+    if (DEBUG_main) {
+        print_point(v[0]);
+        print_point(v[1]);
+
+    }
+    
+    //need to properly copy the centers because we are passing by ref
+    parlay::sequence<center<float>> centers2(k,center<float>()); 
+    parlay::sequence<center<float>> centers3(k,center<float>());
+    for (int i = 0; i < k; i++) {
+        centers2[i].id = centers[i].id;
+        centers2[i].coordinates=sequence<float>(d);
+        centers3[i].id = centers[i].id;
+        centers3[i].coordinates=sequence<float>(d);
+        for (int j = 0; j < d; j++) {
+            centers2[i].coordinates[j] = static_cast<float>(centers[i].coordinates[j]);
+            centers3[i].coordinates[j] = static_cast<float>(centers[i].coordinates[j]);
+
+        }
+    }
+
+    if (DEBUG_main) {
+         std::cout << "centers: " << std::endl;
+    for (int i = 0; i < k; i++) {
+       print_center(centers[i]);
+       print_center(centers2[i]);
+        
+    }
+
+    }
+   
+    
+    double epsilon = 0.01;
+
+    std::cout << "started the first kmeans\n";;
+
+    //double runtime1 = 73.2417;
+    double runtime1 = kmeans_vd<T>(v, centers2,k, m,epsilon);
+    std::cout << "finished the first kmeans " << runtime1 << std::endl;
+    
+    if (DEBUG_main) {
+        std::cout << "centers: " << std::endl;
+    for (int i = 0; i < k; i++) {
+        std::cout << "i:\n";
+        print_center(centers[i]);
+        print_center(centers2[i]);
+    }
+
+    parlay::sequence<size_t> belonging(k);
+    for (int i = 0; i < n; i++) {
+        belonging[v[i].best] += 1;
+    }
+    print_seq(belonging);
+    assert(std::accumulate(belonging)==v.size());
+
+    }
+    
+    return;
+}
+
 //./kmeans_integrated -k 10 -i ../Data/base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10
 //./kmeans_integrated -k 10 -i ../Data/base.1B.u8bin-16.crop_nb_1000 -f bin -t uint8 -m 10 -c original
 
@@ -369,6 +439,9 @@ int main(int argc, char* argv[]){
             else if (impl=="doubled_centers") {
                 bench_no_double_conversion<uint8_t>(v, k, max_iterations, runtime,DEBUG_main); //call kmeans
 
+            }
+            else if (impl == "vd") {
+                bench_vd(v,k,max_iterations,runtime,DEBUG_main);
             }
             else {
                 std::cout << "Please provide an implementation choice" << std::endl;

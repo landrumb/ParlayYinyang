@@ -1,6 +1,10 @@
 //this version of our implementation does not require a dataset of doubles, casts them when needed instead
 
+#ifndef IMP_DC
+#define IMP_DC
+
 //print out a ton of debug info if true
+
 bool DEBUG_DC = false;
 
 #include "types.h"
@@ -104,7 +108,7 @@ template<typename T> sequence<center<double>> compute_centers_double(const seque
 
 template <typename T> std::pair<sequence<center<double>>,double> kmeans_double_center(parlay::sequence<point<T>>& pts, parlay::sequence<center<double>>& centers, size_t k, size_t max_iterations, double epsilon){
 
-    std::cout << "running" << std::endl;
+    std::cout << "running dc" << std::endl;
 
     parlay::internal::timer timer = parlay::internal::timer();
     timer.start();
@@ -196,3 +200,5 @@ template <typename T> std::pair<sequence<center<double>>,double> kmeans_double_c
     //return std::make_pair(centers,timer.total_time());
 
 }
+
+#endif //IMP_DC

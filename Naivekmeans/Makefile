@@ -1,5 +1,6 @@
 
 #Not sure what this does, artifact from ParlayANN
+# it sets up jemalloc, which is a memory allocator that is a little faster than the default for Parlay's 
 ifeq (, $(shell which jemalloc-config))
 JEMALLOC =
 else

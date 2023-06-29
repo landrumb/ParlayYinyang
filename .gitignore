@@ -8,3 +8,4 @@ DistanceBenchmark/dist_test
 DistanceBenchmark/distcheck
 Naivekmeans/kmeans_integrated
 accumulator_test
+Naivekmeans/data.csv

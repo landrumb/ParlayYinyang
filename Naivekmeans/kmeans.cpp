@@ -21,12 +21,10 @@
 //why is this inline? Q*
 template <typename T>
 inline void bench(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime){
-   
     double epsilon = 0.01;
     
     runtime = kmeans_justtime<T>(v, k, m,epsilon);
 
-   
     return;
 }
 
@@ -73,13 +71,11 @@ void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double
     //     print_point(v[i]);
     // }
     if (DEBUG_main) {
-         std::cout << "centers: " << std::endl;
-    for (int i = 0; i < k; i++) {
-       print_center(centers[i]);
-       print_center(centers2[i]);
-        
-    }
-
+        std::cout << "centers: " << std::endl;
+        for (int i = 0; i < k; i++) {
+            print_center(centers[i]);
+            print_center(centers2[i]);
+        }
     }
    
     
@@ -95,16 +91,13 @@ void bench_givecenters(parlay::sequence<point<T>> &v, size_t k, size_t m, double
 
     if (DEBUG_main) {
         std::cout << "centers: " << std::endl;
-    for (int i = 0; i < k; i++) {
-        std::cout << "i:\n";
-        print_center(centers[i]);
-        print_center(centers2[i]);
-    }
-
+        for (int i = 0; i < k; i++) {
+            std::cout << "i:\n";
+            print_center(centers[i]);
+            print_center(centers2[i]);
+        }
     }
     
-
-   
     return;
 }
 //./kmeans -k 10 -i ../Data/base.1B.u8bin.crop_nb_1000000 -f bin -t uint8 -m 10

@@ -14,7 +14,7 @@ using namespace std;
 template<typename T>
 void to_csv(parlay::sequence<point<T>>& pts, parlay::sequence<center<T>>& centers, size_t n, size_t k, size_t d){
 
-    cout << " WE REACHED HERE";
+    cout << " WE REACHED to_csv " << endl;
 
         // Open the file for writing
     ofstream file("data.csv");
@@ -36,13 +36,11 @@ void to_csv(parlay::sequence<point<T>>& pts, parlay::sequence<center<T>>& center
         }
         file << '\n';
     }
-
-    
     
     // Close the file
     file.close();
 
-    cout << "CSV file created successfully.\n";
+    cout << "CSV file created successfully." << endl; // std::endl (as opposed to \n) has the advantage of flushing the stream so the print shows immediately
 
 }
 

@@ -27,9 +27,8 @@ INCLUDE = -I /parlay/ -I .
 
 all: kmeans
 
-kmeans: kmeans.cpp impshared_4.h 
+kmeans: kmeans.cpp impshared_4.h convert_to_csv.h types.h kmeans_guy.h
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans kmeans.cpp  
-
 
 kmeans_stats: kmeans_stats.cpp impshared_4_stats.h 
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans kmeans_stats.cpp  

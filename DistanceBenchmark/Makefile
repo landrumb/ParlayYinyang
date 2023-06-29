@@ -40,9 +40,9 @@ andrew_dist_test: distanceTest.cc NSGDist.h
 	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS) -o dist_test distanceTest.cc
 
 a_dist_check2: distanceBenchmark_withComments.cc NSGDist.h
-	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS)  -o distcheck2 distanceBenchmark_withComments.cc 
+	$(ANDREW_CC) $(CFLAGS) $(INCLUDE) $(ANDREW_LFLAGS)  -o dist_check2 distanceBenchmark_withComments.cc 
 
 
 
 clean:
-	rm -f distcheck dist_test andrew_dist_test andrew_distcheck
+	rm -f distcheck dist_test andrew_dist_test andrew_distcheck dist_check2

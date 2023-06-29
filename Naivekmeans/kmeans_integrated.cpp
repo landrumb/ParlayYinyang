@@ -263,6 +263,7 @@ void bench_vd(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime
     size_t n = v.size();
     size_t d = v[0].coordinates.size();
     std::cout << "d: " << d << std::endl;
+    std::cout << "calling vd" << std::endl;
 
     parlay::sequence<center<T>> centers = create_centers(v,n,k,d);
     if (DEBUG_main) {
@@ -317,7 +318,9 @@ void bench_vd(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime
     for (int i = 0; i < n; i++) {
         belonging[v[i].best] += 1;
     }
+    std::cout << "printing belonging: " << std::endl;
     print_seq(belonging);
+    std::cout << "finished printing belonging " << std::endl;
     assert(std::accumulate(belonging)==v.size());
 
     }

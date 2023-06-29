@@ -174,6 +174,13 @@ double euclidean_squared(const double a[], const parlay::sequence<double>& b) {
   }));
 
 }
+double euclidean_squared(float a[], parlay::sequence<float>& b) {
+    return parlay::reduce(parlay::delayed::tabulate(b.size(), [&](long i) {
+    auto d = a[i] - b[i];
+    return d * d;
+  }));
+
+}
 
 
 #endif

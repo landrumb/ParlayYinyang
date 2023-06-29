@@ -33,9 +33,18 @@ kmeans: kmeans.cpp impshared_4.h convert_to_csv.h types.h kmeans_guy.h
 kmeans_stats: kmeans_stats.cpp impshared_4_stats.h 
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans kmeans_stats.cpp  
 
-andrew_kmeans: kmeans.cpp impshared_4.h
+a_kmeans4: kmeans.cpp impshared_4.h kmeans_guy.h types.h
 
-	$(ANDREW_FLAGS)  -o kmeans kmeans.cpp  
+	$(ANDREW_FLAGS)  -o kmeans4 kmeans.cpp  
+
+# a_kmeans5: kmeans.cpp impshared_5.h types.h NSGDist.h
+# 	$(ANDREW_FLAGS)  -o kmeans5 kmeans_improved.cpp
+
+a_kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_centers.h impshared_4.h kmeans_guy.h types.h
+	$(ANDREW_FLAGS)  -o kmeans_integrated kmeans_integrated.cpp  
+
+kmeans_integrated: kmeans_integrated.cpp imp_with_euc_dist.h imp_doubled_centers.h impshared_4.h kmeans_guy.h types.h
+	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans_integrated kmeans_integrated.cpp  
 
 clean:
-	rm -f kmeans
+	rm -f kmeans kmeans4 kmeans5 kmeans_integrated

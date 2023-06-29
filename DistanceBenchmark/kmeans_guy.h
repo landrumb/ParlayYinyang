@@ -28,7 +28,21 @@
 
 using namespace parlay;
 
-bool DEBUG_guy = false;
+template <typename T>
+double euclidean_squared(const sequence<T>& a, const sequence<T>& b) {
+  return parlay::reduce(parlay::delayed::tabulate(a.size(), [&](long i) {
+    auto d = a[i] - b[i];
+    return d * d;
+  }));
+}
+
+template <typename T>
+double euclidean_squared(const slice<T*, T*>& a, const sequence<T>& b) {
+  return parlay::reduce(parlay::delayed::tabulate(a.size(), [&](long i) {
+    auto d = a[i] - b[i];
+    return d * d;
+  }));
+}
 
 // the 100 in the following two is for granularity control
 // i.e. if the number of dimensions is less than 100, run sequentially
@@ -124,15 +138,11 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
 
   long round = 0;
   while (round < max_iterations) {
-      
-      if (DEBUG_guy) {
-          std::cout << "centers: " << round << std::endl;
+
+      std::cout << "centers: " << round << std::endl;
     for (int i = 0; i < k; i++) {
        print_center(centers[i]);        
     }
-
-      }
-    
     // for each point find closest among the k centers (kpts)
 
 //    // 1. Identify for every point, its center and create a
@@ -182,16 +192,13 @@ std::pair<sequence<center<T>>, double> guy_kmeans(sequence<point<T>>& pts,
 //    // using a homemade reduce_by_index because
     auto mid_and_counts = reduce_by_index(closest, k, addme);
 
-    if (DEBUG_guy) {
-        std::cout << "outputting mid and counts" << std::endl;
-      for (int i = 0; i < k; i++) {
-        std::cout << mid_and_counts[i].second << std::endl;
-        print_seq(mid_and_counts[i].first);
-        std::cout << std::endl;
-      }
-
+    std::cout << "outputting mid and counts" << std::endl;
+    for (int i = 0; i < k; i++) {
+      std::cout << mid_and_counts[i].second << std::endl;
+      print_seq(mid_and_counts[i].first);
+      std::cout << std::endl;
     }
-    
+
     // Calculate new centers (average of the points)
     auto new_kpts =
         parlay::map(mid_and_counts, [&](std::pair<sequence<T>, size_t> mcnt) {

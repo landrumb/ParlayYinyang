@@ -2,11 +2,8 @@
 #include "parse_files.h"
 #include "parse_command_line.h"
 
-<<<<<<< HEAD
 #include "impshared_4_stats.h"
-=======
-#include "impshared_4.h"
->>>>>>> c48c5e5de84387f7d5e561e8124a0dda382239bd
+
 //#include "kmeans_guy.h"
 
 #include <iostream>
@@ -116,8 +113,6 @@ int main(int argc, char* argv[]){
             abort();
         }
     }
-
-    //bs he didn't make the output file coordination yet 
 
     std::cout << "Done in " << runtime << std::endl;
 

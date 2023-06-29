@@ -9,7 +9,7 @@
 
 echo $HOSTNAME
 
-if [ $HOSTNAME == "wireless-10-104-78-145.umd.edu" ] #yes spaces! spaces matter in this language 
+if [ $HOSTNAME == "wireless-10-104-78-145.umd.edu" ] || [ $HOSTNAME == "MacBook-Pro-4.local" ] #yes spaces! spaces matter in this language 
 then
 echo "A kmeans"
 make clean

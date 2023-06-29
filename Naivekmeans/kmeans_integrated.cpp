@@ -265,6 +265,11 @@ void bench_vd(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime
     std::cout << "d: " << d << std::endl;
     std::cout << "calling vd" << std::endl;
 
+    if (n < k) {
+        std::cout << "error, n < k " << std::endl;
+        abort();
+    }
+
     parlay::sequence<center<T>> centers = create_centers(v,n,k,d);
     if (DEBUG_main) {
         print_point(v[0]);

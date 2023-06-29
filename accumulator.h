@@ -5,12 +5,14 @@
 #include <math.h>
 #include <stdlib.h>
 
+// no performance difference between 64 and higher values, but 32 is significantly slower
+#define BUFFER 64 
+
 template <typename T>
 struct accumulator {
 
-    size_t width = 128 / sizeof(T);
+    size_t width = BUFFER / sizeof(T);
     parlay::sequence<T> counts = parlay::sequence<T>(parlay::num_workers() * width, (T)0);
-
 
     accumulator() {}
 

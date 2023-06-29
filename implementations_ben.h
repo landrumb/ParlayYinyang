@@ -130,7 +130,6 @@ double kmeans(parlay::sequence<point<T>> &v, parlay::sequence<center<T>> &center
 
     size_t dim = v[0].coordinates.size();
     size_t n = v.size();
-
     
     // initialize the centers by selecting k random points from v
     auto center_indices = parlay::random_permutation(n).cut(0, k);

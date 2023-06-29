@@ -7,9 +7,10 @@
 //print out a ton of debug info if true
 bool DEBUG_4 = false;
 
+
+#include "convert_to_csv.h"
 #include "types.h"
 #include "center_creation.h"
-
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -275,11 +276,23 @@ template <typename T> std::pair<sequence<center<T>>,double> naive_kmeans(parlay:
     }
     
   }
+
+
+    // CREATING A CSV
+
+    std::cout << "CSV WE REACHED IT WOHOOO";
+    to_csv(pts, centers, n,k,d);
+   std::cout << "center printing" << std::endl;
+  // for (int i = 0; i < k; i++) {
+  //   print_center(centers[i]);
+  // }
+
     if (DEBUG_4) {
          std::cout << "center printing" << std::endl;
   for (int i = 0; i < k; i++) {
     print_center(centers[i]);
   }
+
   std::cout << "Error" << total_diff << std::endl;
   std::cout << std::endl << std::endl;
 

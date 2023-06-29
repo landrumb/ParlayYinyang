@@ -7,3 +7,4 @@ Naivekmeans/kmeans5
 DistanceBenchmark/dist_test
 DistanceBenchmark/distcheck
 Naivekmeans/kmeans_integrated
+accumulator_test

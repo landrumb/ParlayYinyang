@@ -274,15 +274,15 @@ void bench_vd(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime
     
     //need to properly copy the centers because we are passing by ref
     parlay::sequence<center<float>> centers2(k,center<float>()); 
-    parlay::sequence<center<float>> centers3(k,center<float>());
+    parlay::sequence<center<double>> centers3(k,center<double>());
     for (int i = 0; i < k; i++) {
         centers2[i].id = centers[i].id;
         centers2[i].coordinates=sequence<float>(d);
         centers3[i].id = centers[i].id;
-        centers3[i].coordinates=sequence<float>(d);
+        centers3[i].coordinates=sequence<double>(d);
         for (int j = 0; j < d; j++) {
             centers2[i].coordinates[j] = static_cast<float>(centers[i].coordinates[j]);
-            centers3[i].coordinates[j] = static_cast<float>(centers[i].coordinates[j]);
+            centers3[i].coordinates[j] = static_cast<double>(centers[i].coordinates[j]);
 
         }
     }
@@ -305,13 +305,15 @@ void bench_vd(parlay::sequence<point<T>> &v, size_t k, size_t m, double &runtime
     //double runtime1 = 73.2417;
     double runtime1 = kmeans_vd<T>(v, centers2,k, m,epsilon);
     std::cout << "finished the first kmeans " << runtime1 << std::endl;
-    
+    double runtime2 = kmeans_double_center<T>(v,centers3,k,m,epsilon).second;
+    std::cout << "finished the second kmeans " << runtime2 << std::endl;
+
     if (DEBUG_main) {
         std::cout << "centers: " << std::endl;
     for (int i = 0; i < k; i++) {
         std::cout << "i:\n";
-        print_center(centers[i]);
         print_center(centers2[i]);
+        print_center(centers3[i]);
     }
 
     parlay::sequence<size_t> belonging(k);

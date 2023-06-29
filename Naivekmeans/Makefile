@@ -33,6 +33,9 @@ kmeans: kmeans.cpp impshared_4.h
 kmeans_stats: kmeans_stats.cpp impshared_4_stats.h 
 	$(CC) $(CFLAGS) $(INCLUDE) $(LFLAGS)  -o kmeans kmeans_stats.cpp  
 
+a_kmeans_stats: kmeans_stats.cpp impshared_4_stats.h 
+	$(ANDREW_FLAGS)  -o kmeans kmeans_stats.cpp  
+
 a_kmeans4: kmeans.cpp impshared_4.h kmeans_guy.h types.h
 
 	$(ANDREW_FLAGS)  -o kmeans4 kmeans.cpp  
